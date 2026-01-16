@@ -1,0 +1,69 @@
+# GrowthEngineAI LMS - URL Rewriting
+# Enable clean URLs without .php extensions
+
+RewriteEngine On
+RewriteBase /growthengine1/
+
+# Remove trailing slash (except for directories)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ $1 [R=301,L]
+
+# Redirect .php extension to clean URL
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# ------------------------------------
+# STUDENT ROUTES
+# ------------------------------------
+
+# Single Course View: /student/course/{category-slug}/{course-slug}
+RewriteRule ^student/course/([a-z0-9-]+)/([a-z0-9-]+)$ student/course.php?category=$1&slug=$2 [L,NC,QSA]
+
+# Single Course View (short): /student/course/{course-slug}
+RewriteRule ^student/course/([a-z0-9-]+)$ student/course.php?slug=$1 [L,NC,QSA]
+
+# Learn Page with Lesson: /student/learn/{course-slug}/{lesson-slug}
+RewriteRule ^student/learn/([a-z0-9-]+)/lesson/([a-z0-9-]+)$ student/learn.php?course_slug=$1&lesson_slug=$2 [L,NC,QSA]
+
+# Learn Page with Quiz: /student/learn/{course-slug}/quiz/{quiz-id}
+RewriteRule ^student/learn/([a-z0-9-]+)/quiz/([0-9]+)$ student/learn.php?course_slug=$1&type=quiz&item_id=$2 [L,NC,QSA]
+
+# Learn Page with Assignment: /student/learn/{course-slug}/assignment/{assignment-id}
+RewriteRule ^student/learn/([a-z0-9-]+)/assignment/([0-9]+)$ student/learn.php?course_slug=$1&type=assignment&item_id=$2 [L,NC,QSA]
+
+# Learn Page: /student/learn/{course-slug}
+RewriteRule ^student/learn/([a-z0-9-]+)$ student/learn.php?course_slug=$1 [L,NC,QSA]
+
+# ------------------------------------
+# GENERAL RULES
+# ------------------------------------
+
+# If file exists, serve it directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# If directory exists, serve it directly
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Handle PHP files without extension
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Prevent access to .htaccess file
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent directory listing
+Options -Indexes
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Enable GZIP compression (optional - for performance)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
