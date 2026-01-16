@@ -10,7 +10,7 @@
  * 3. Go to APIs & Services > Credentials
  * 4. Click "Create Credentials" > "OAuth client ID"
  * 5. Select "Web application"
- * 6. Add authorized redirect URI: http://localhost/growthengine1/auth/google-callback.php
+ * 6. Add authorized redirect URI: https://growthengineai.org/auth/google-callback.php
  * 7. Copy the Client ID and Client Secret below
  */
 

@@ -15,7 +15,7 @@ define('DB_CHARSET', 'utf8mb4');
 
 // Site configuration
 define('SITE_NAME', 'GrowthEngineAI');
-define('SITE_URL', 'http://localhost/growthengine1');
+define('SITE_URL', 'https://growthengineai.org');
 define('SITE_EMAIL', 'info@growthengineai.org');
 
 // Define logo links
