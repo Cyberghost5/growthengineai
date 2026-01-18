@@ -5,17 +5,21 @@
  */
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/paystack.php';
+require_once __DIR__ . '/../classes/Settings.php';
 
 class Paystack {
     private $db;
     private $secretKey;
     private $publicKey;
+    private $settings;
     
     public function __construct() {
         $this->db = getDB();
-        $this->secretKey = PAYSTACK_SECRET_KEY;
-        $this->publicKey = PAYSTACK_PUBLIC_KEY;
+        $this->settings = new Settings();
+        
+        // Load keys from database
+        $this->publicKey = $this->settings->get('paystack_public_key', 'pk_test_your_public_key_here');
+        $this->secretKey = $this->settings->get('paystack_secret_key', 'sk_test_your_secret_key_here');
     }
     
     /**
@@ -35,13 +39,17 @@ class Paystack {
         // Generate unique reference
         $reference = 'GE_' . time() . '_' . uniqid();
         
+        // Get currency and callback URL from settings
+        $currency = $this->settings->get('paystack_currency', 'NGN');
+        $callbackUrl = SITE_URL . '/student/payment-callback.php';
+        
         // Prepare payment data
         $data = [
             'email' => $email,
             'amount' => $amountInKobo,
             'reference' => $reference,
-            'currency' => PAYSTACK_CURRENCY,
-            'callback_url' => PAYSTACK_CALLBACK_URL,
+            'currency' => $currency,
+            'callback_url' => $callbackUrl,
             'metadata' => array_merge([
                 'user_id' => $userId,
                 'course_id' => $courseId,
@@ -65,7 +73,7 @@ class Paystack {
                 'user_id' => $userId,
                 'course_id' => $courseId,
                 'amount' => $amount,
-                'currency' => PAYSTACK_CURRENCY,
+                'currency' => $currency,
                 'status' => 'pending',
                 'payment_method' => 'paystack',
                 'email' => $email
@@ -122,7 +130,8 @@ class Paystack {
      * Make HTTP request to Paystack API
      */
     private function makeRequest($endpoint, $method = 'GET', $data = []) {
-        $url = PAYSTACK_API_URL . '/' . $endpoint;
+        $apiUrl = 'https://api.paystack.co';
+        $url = $apiUrl . '/' . $endpoint;
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
