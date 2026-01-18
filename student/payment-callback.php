@@ -31,18 +31,14 @@ if ($verification['success']) {
     $transaction = $verification['data'];
     $amount = $transaction['amount'] / 100; // Convert from kobo to naira
     
-    // Save transaction to database
-    $paystack->saveTransaction([
-        'reference' => $reference,
-        'user_id' => $user['id'],
-        'course_id' => $courseId,
-        'amount' => $amount,
-        'status' => 'completed',
-        'email' => $user['email']
-    ]);
+    // Transaction is already saved and updated by verifyPayment()
+    // Just enroll the user in the course
+    $enrollResult = $courseModel->enrollUser($user['id'], $courseId, $amount);
     
-    // Enroll the user in the course
-    $courseModel->enrollUser($user['id'], $courseId, $amount);
+    // Log enrollment result for debugging
+    if (!$enrollResult['success']) {
+        error_log("Enrollment failed for user {$user['id']} in course {$courseId}: {$enrollResult['message']}");
+    }
     
     // Get course details for redirect
     $course = $courseModel->getCourseById($courseId);
