@@ -648,12 +648,9 @@ foreach ($categoriesRaw as $cat) {
                                             </div>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-outline-secondary btn-sm">
-                                                <i class="bi bi-eye me-1"></i>View
+                                            <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll btn-sm enroll-btn">
+                                                <i class="bi bi-cart-plus me-1"></i>View
                                             </a>
-                                            <button class="btn btn-enroll btn-sm enroll-btn" data-course-id="<?php echo $course['id']; ?>" data-course-title="<?php echo htmlspecialchars($course['title']); ?>" data-price="<?php echo $course['price']; ?>" data-is-free="<?php echo $course['is_free'] ? '1' : '0'; ?>">
-                                                <i class="bi bi-cart-plus me-1"></i>Enroll
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -667,7 +664,6 @@ foreach ($categoriesRaw as $cat) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
         // Show payment notification alerts
         const urlParams = new URLSearchParams(window.location.search);
@@ -698,104 +694,7 @@ foreach ($categoriesRaw as $cat) {
             }, 5000);
         }
 
-        // Handle course enrollment with Paystack
-        document.querySelectorAll('.enroll-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const courseId = this.getAttribute('data-course-id');
-                const courseTitle = this.getAttribute('data-course-title');
-                const price = parseFloat(this.getAttribute('data-price'));
-                const isFree = this.getAttribute('data-is-free') === '1';
-                
-                console.log('Enrolling in course:', { courseId, courseTitle, price, isFree });
-                
-                // Store button reference
-                const enrollButton = this;
-                
-                // Disable button
-                enrollButton.disabled = true;
-                enrollButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
-                
-                // Make checkout request
-                fetch('<?php echo Url::base(); ?>/student/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `course_id=${courseId}`
-                })
-                .then(response => {
-                    // Check if response is ok
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // Check if response is JSON
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Response is not JSON');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Checkout response:', data);
-                    
-                    if (data.success) {
-                        if (data.free_course) {
-                            // Free course - redirect directly
-                            showAlert(data.message, 'success');
-                            setTimeout(() => {
-                                window.location.href = data.redirect;
-                            }, 1000);
-                        } else if (data.payment_required) {
-                            // Paid course - initialize Paystack
-                            const handler = PaystackPop.setup({
-                                key: '<?php echo $paystackPublicKey; ?>',
-                                email: '<?php echo $user['email']; ?>',
-                                amount: price * 100, // Convert to kobo
-                                currency: 'NGN',
-                                ref: data.reference,
-                                callback: function(response) {
-                                    // Payment successful
-                                    showAlert('Payment successful! Redirecting...', 'success');
-                                    window.location.href = 'payment-callback.php?reference=' + response.reference + '&course_id=' + courseId;
-                                },
-                                onClose: function() {
-                                    // User closed payment modal
-                                    showAlert('Payment cancelled', 'warning');
-                                    // Re-enable button
-                                    enrollButton.disabled = false;
-                                    enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
-                                }
-                            });
-                            handler.openIframe();
-                        }
-                    } else {
-                        console.error('Checkout failed:', data);
-                        showAlert(data.message, 'danger');
-                        
-                        // Show detailed error if available
-                        if (data.error_type) {
-                            console.error('Error Type:', data.error_type);
-                            console.error('Error File:', data.error_file + ':' + data.error_line);
-                            console.error('Stack Trace:', data.trace);
-                        }
-                        
-                        // Re-enable button
-                        enrollButton.disabled = false;
-                        enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('An error occurred. Please try again.', 'danger');
-                    // Re-enable button
-                    enrollButton.disabled = false;
-                    enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
-                });
-            });
-        });
-
+        
         // Filter functionality
         document.querySelectorAll('.filter-tab').forEach(tab => {
             tab.addEventListener('click', function() {
