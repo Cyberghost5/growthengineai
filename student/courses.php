@@ -219,114 +219,214 @@ foreach ($categoriesRaw as $cat) {
         }
         .card {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
+            background: white;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .course-card {
+            position: relative;
+        }
+        .course-card .image-wrapper {
+            position: relative;
+            overflow: hidden;
         }
         .course-card .course-image {
-            height: 180px;
+            height: 200px;
             object-fit: cover;
             width: 100%;
+            transition: transform 0.5s ease;
         }
-        .course-card .course-category {
+        .course-card:hover .course-image {
+            transform: scale(1.08);
+        }
+        .course-card .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .course-card:hover .image-overlay {
+            opacity: 1;
+        }
+        .course-card .course-badges {
             position: absolute;
             top: 12px;
             left: 12px;
-            background: rgba(139, 92, 246, 0.9);
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 2;
+        }
+        .course-card .course-category {
+            background: linear-gradient(135deg, #000016 0%, #00212d 100%);
             color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .course-card .course-level {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .course-card .course-level.beginner {
-            background: rgba(16, 185, 129, 0.9);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
         .course-card .course-level.intermediate {
-            background: rgba(245, 158, 11, 0.9);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
         }
         .course-card .course-level.advanced {
-            background: rgba(239, 68, 68, 0.9);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        .course-card .course-level.all_levels {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
         }
         .course-card .progress-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(16, 185, 129, 0.9);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .course-card .card-body {
-            padding: 20px;
+            padding: 24px;
         }
         .course-card .course-title {
-            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
             color: #1e293b;
-            font-size: 16px;
-            margin-bottom: 8px;
+            font-size: 17px;
+            margin-bottom: 10px;
             line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 48px;
         }
         .course-card .course-instructor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: #64748b;
             font-size: 13px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+        }
+        .course-card .course-instructor i {
+            font-size: 16px;
+            color: #000016;
+        }
+        .course-card .course-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 16px;
+            min-height: 42px;
         }
         .course-card .course-meta {
             display: flex;
-            gap: 16px;
+            gap: 20px;
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .course-card .course-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .course-card .course-meta i {
+            font-size: 14px;
             color: #94a3b8;
-            font-size: 13px;
-            margin-bottom: 12px;
         }
         .course-card .course-rating {
-            color: #f59e0b;
+            color: #f59e0b !important;
         }
-        .course-card .course-stats {
+        .course-card .course-rating i {
+            color: #f59e0b !important;
+        }
+        .course-card .course-footer {
             display: flex;
             justify-content: space-between;
-            padding-top: 12px;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
+            align-items: center;
+        }
+        .course-card .course-price {
+            display: flex;
+            flex-direction: column;
+        }
+        .course-card .price-current {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #000016;
+        }
+        .course-card .price-original {
             font-size: 13px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .course-card .price-free {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #10b981;
+        }
+        .course-card .students-count {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .btn-enroll {
             background: linear-gradient(135deg, #000016 0%, #00212d 100%);
             border: none;
             color: white;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 22, 0.3);
         }
         .btn-enroll:hover {
-            background: linear-gradient(135deg, #000016 0%, #00212d 100%);
+            background: linear-gradient(135deg, #00212d 0%, #003344 100%);
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 22, 0.4);
         }
         .btn-enroll:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         .btn-outline-secondary {
             border-color: #cbd5e1;
@@ -341,10 +441,18 @@ foreach ($categoriesRaw as $cat) {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
             color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
         .btn-continue:hover {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
         .filter-tabs {
             display: flex;
@@ -566,27 +674,40 @@ foreach ($categoriesRaw as $cat) {
                         <?php foreach ($enrolledCourses as $course): ?>
                         <div class="col-xl-4 col-lg-6">
                             <div class="card course-card h-100">
-                                <div class="position-relative">
+                                <div class="image-wrapper">
                                     <img src="<?php echo htmlspecialchars($course['image']); ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="course-image">
-                                    <span class="course-category"><?php echo htmlspecialchars($course['category']); ?></span>
-                                    <div class="progress-badge">
-                                        <i class="bi bi-pie-chart-fill me-1"></i><?php echo $course['progress']; ?>%
+                                    <div class="image-overlay"></div>
+                                    <div class="course-badges">
+                                        <span class="course-category"><?php echo htmlspecialchars($course['category']); ?></span>
+                                        <span class="progress-badge">
+                                            <i class="bi bi-pie-chart-fill me-1"></i><?php echo $course['progress']; ?>%
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <h6 class="course-title"><?php echo htmlspecialchars($course['title']); ?></h6>
-                                    <p class="course-instructor"><i class="bi bi-person-circle me-1"></i><?php echo htmlspecialchars($course['instructor']); ?></p>
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <small class="text-muted"><?php echo $course['lessons_completed']; ?>/<?php echo $course['total_lessons']; ?> Lessons</small>
-                                            <small class="text-muted"><?php echo $course['progress']; ?>%</small>
-                                        </div>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar" style="width: <?php echo $course['progress']; ?>%"></div>
-                                        </div>
+                                    <div class="course-instructor">
+                                        <i class="bi bi-person-circle"></i>
+                                        <span><?php echo htmlspecialchars($course['instructor']); ?></span>
                                     </div>
-                                    <p class="text-muted small mb-3 flex-grow-1"><i class="bi bi-arrow-right-circle me-1"></i>Next: <?php echo htmlspecialchars($course['next_lesson']); ?></p>
-                                    <a href="<?php echo Url::learn($course['slug']); ?>" class="btn btn-continue w-100"><i class="bi bi-play-fill me-1"></i>Continue</a>
+                                    <div class="course-meta">
+                                        <span><i class="bi bi-collection-play"></i><?php echo $course['lessons_completed']; ?>/<?php echo $course['total_lessons']; ?> lessons</span>
+                                    </div>
+                                    <div class="mb-3 flex-grow-1">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <small class="text-muted fw-medium">Progress</small>
+                                            <small class="fw-bold" style="color: #10b981;"><?php echo $course['progress']; ?>%</small>
+                                        </div>
+                                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                                            <div class="progress-bar" style="width: <?php echo $course['progress']; ?>%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 4px;"></div>
+                                        </div>
+                                        <p class="text-muted small mt-2 mb-0">
+                                            <i class="bi bi-arrow-right-circle me-1"></i>Next: <?php echo htmlspecialchars($course['next_lesson']); ?>
+                                        </p>
+                                    </div>
+                                    <a href="<?php echo Url::learn($course['slug']); ?>" class="btn btn-continue w-100">
+                                        <i class="bi bi-play-fill me-1"></i>Continue Learning
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -619,39 +740,41 @@ foreach ($categoriesRaw as $cat) {
                         <?php foreach ($availableCourses as $course): ?>
                         <div class="col-xl-4 col-lg-6" data-category="<?php echo htmlspecialchars($course['category']); ?>">
                             <div class="card course-card h-100">
-                                <div class="position-relative">
+                                <div class="image-wrapper">
                                     <img src="<?php echo htmlspecialchars($course['image']); ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="course-image">
-                                    <span class="course-category"><?php echo htmlspecialchars($course['category']); ?></span>
-                                    <span class="course-level <?php echo strtolower($course['level']); ?>"><?php echo htmlspecialchars($course['level']); ?></span>
+                                    <div class="image-overlay"></div>
+                                    <div class="course-badges">
+                                        <span class="course-category"><?php echo htmlspecialchars($course['category']); ?></span>
+                                        <span class="course-level <?php echo strtolower(str_replace(' ', '_', $course['level'])); ?>"><?php echo htmlspecialchars($course['level']); ?></span>
+                                    </div>
                                 </div>
                                 <div class="card-body d-flex flex-column">
                                     <h6 class="course-title"><?php echo htmlspecialchars($course['title']); ?></h6>
-                                    <p class="course-instructor"><i class="bi bi-person-circle me-1"></i><?php echo htmlspecialchars($course['instructor']); ?></p>
-                                    <p class="text-muted small flex-grow-1"><?php echo htmlspecialchars($course['description']); ?></p>
-                                    <div class="course-meta">
-                                        <span><i class="bi bi-clock me-1"></i><?php echo htmlspecialchars($course['duration']); ?></span>
-                                        <span><i class="bi bi-play-circle me-1"></i><?php echo $course['lessons']; ?> lessons</span>
-                                        <span class="course-rating"><i class="bi bi-star-fill me-1"></i><?php echo $course['rating']; ?></span>
+                                    <div class="course-instructor">
+                                        <i class="bi bi-person-circle"></i>
+                                        <span><?php echo htmlspecialchars($course['instructor']); ?></span>
                                     </div>
-                                    <div class="course-stats">
-                                        <div>
-                                            <span><i class="bi bi-people me-1"></i><?php echo number_format($course['students']); ?> students</span>
-                                            <div class="mt-2">
-                                                <?php if ($course['is_free']): ?>
-                                                    <span class="badge bg-success">Free</span>
-                                                <?php else: ?>
-                                                    <strong class="text-primary">₦<?php echo number_format($course['price'], 2); ?></strong>
-                                                    <?php if ($course['sale_price'] > 0 && $course['sale_price'] < $course['original_price']): ?>
-                                                        <small class="text-muted text-decoration-line-through ms-2">₦<?php echo number_format($course['original_price'], 2); ?></small>
-                                                    <?php endif; ?>
+                                    <p class="course-description"><?php echo htmlspecialchars($course['description']); ?></p>
+                                    <div class="course-meta">
+                                        <span><i class="bi bi-clock"></i><?php echo htmlspecialchars($course['duration']); ?></span>
+                                        <span><i class="bi bi-collection-play"></i><?php echo $course['lessons']; ?> lessons</span>
+                                        <span class="course-rating"><i class="bi bi-star-fill"></i><?php echo number_format($course['rating'], 1); ?></span>
+                                    </div>
+                                    <div class="course-footer mt-auto">
+                                        <div class="course-price">
+                                            <?php if ($course['is_free']): ?>
+                                                <span class="price-free">FREE</span>
+                                            <?php else: ?>
+                                                <span class="price-current">₦<?php echo number_format($course['price']); ?></span>
+                                                <?php if ($course['sale_price'] > 0 && $course['sale_price'] < $course['original_price']): ?>
+                                                    <span class="price-original">₦<?php echo number_format($course['original_price']); ?></span>
                                                 <?php endif; ?>
-                                            </div>
+                                            <?php endif; ?>
+                                            <span class="students-count"><i class="bi bi-people-fill"></i><?php echo number_format($course['students']); ?> enrolled</span>
                                         </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll btn-sm enroll-btn">
-                                                <i class="bi bi-cart-plus me-1"></i>Enroll
-                                            </a>
-                                        </div>
+                                        <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll">
+                                            View Course
+                                        </a>
                                     </div>
                                 </div>
                             </div>

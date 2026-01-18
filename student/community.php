@@ -528,7 +528,7 @@ $benefits = [
                             </svg>
                             <h2>Join Our Slack Community</h2>
                             <p class="mb-4" style="font-size: 18px; opacity: 0.9;">Connect with 2,500+ students, mentors, and AI professionals. Get help, share projects, and accelerate your learning journey.</p>
-                            <a href="<?php echo htmlspecialchars($slackWorkspaceUrl); ?>" target="_blank" class="btn-slack">
+                            <a href="<?php echo htmlspecialchars($slackWorkspaceUrl); ?>" target="_blank" class="btn-slack" style="text-decoration: none;">
                                 <svg viewBox="0 0 127 127" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#E01E5A"/>
                                     <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H13.9C6.6 60.1.7 54.2.7 46.9c0-7.3 5.9-13.2 13.2-13.2H47z" fill="#36C5F0"/>

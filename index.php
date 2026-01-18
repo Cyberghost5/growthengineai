@@ -1,4 +1,66 @@
-<!DOCTYPE html><html lang="en"><head>
+<?php
+/**
+ * GrowthEngineAI LMS - Landing Page
+ * Displays courses dynamically from the database
+ */
+
+require_once __DIR__ . '/classes/Course.php';
+
+$courseModel = new Course();
+
+// Get featured/published courses from database (limit to 6 for landing page)
+$coursesRaw = $courseModel->getAllCourses(['limit' => 6]);
+$courses = [];
+
+// Map category icons
+$categoryIcons = [
+    'cybersecurity' => 'bi-shield-lock',
+    'devops' => 'bi-gear-wide-connected',
+    'cloud' => 'bi-cloud',
+    'cloud computing' => 'bi-cloud',
+    'data science' => 'bi-bar-chart-line',
+    'software development' => 'bi-code-slash',
+    'web development' => 'bi-code-slash',
+    'system administration' => 'bi-hdd-network',
+    'default' => 'bi-book'
+];
+
+foreach ($coursesRaw as $course) {
+    $categorySlug = strtolower($course['category_name'] ?? '');
+    $icon = $categoryIcons[$categorySlug] ?? $categoryIcons['default'];
+    
+    // Get what_you_learn as features (limit to 3)
+    $whatYouLearn = json_decode($course['what_you_learn'] ?? '[]', true) ?: [];
+    $features = array_slice($whatYouLearn, 0, 3);
+    
+    $courses[] = [
+        'id' => $course['id'],
+        'slug' => $course['slug'],
+        'title' => $course['title'],
+        'description' => $course['description'] ? substr(strip_tags($course['description']), 0, 150) . '...' : '',
+        'category' => $course['category_name'],
+        'icon' => $icon,
+        'features' => $features,
+        'level' => ucfirst($course['level']),
+        'is_featured' => $course['is_featured'] ?? false,
+        'price' => $course['is_free'] ? 0 : ($course['sale_price'] > 0 ? $course['sale_price'] : $course['price']),
+        'is_free' => $course['is_free']
+    ];
+}
+
+// Get categories for portfolio filter
+$categoriesRaw = $courseModel->getCategories();
+$categories = [];
+foreach ($categoriesRaw as $cat) {
+    $categories[] = [
+        'name' => $cat['name'],
+        'slug' => $cat['slug']
+    ];
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>GrowthEngineAI - Your Partner in Intelligent Transformation</title>
@@ -233,143 +295,48 @@
               <p class="intro-text">Master the skills that top employers demand. Our premium courses are designed to take you from beginner to job-ready professional.</p>
             </div>
             <div class="col-lg-5 text-lg-end">
-              <a href="#contact" class="btn-view-all">View All Courses <i class="bi bi-arrow-right"></i></a>
+              <a href="student/courses" class="btn-view-all">View All Courses <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
         </div>
 
         <div class="row gy-4">
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
+          <?php if (empty($courses)): ?>
+          <!-- Fallback if no courses in database -->
+          <div class="col-12 text-center">
+            <p class="text-muted">No courses available at the moment. Check back soon!</p>
+          </div>
+          <?php else: ?>
+          <?php $delay = 150; foreach ($courses as $course): ?>
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?= $delay ?>">
             <div class="service-item">
               <div class="service-header">
                 <div class="icon-wrapper">
-                  <i class="bi bi-shield-lock"></i>
+                  <i class="bi <?= htmlspecialchars($course['icon']) ?>"></i>
                 </div>
-                <span class="badge-popular">Coming Soon</span>
+                <?php if ($course['is_featured']): ?>
+                <span class="badge-popular">Featured</span>
+                <?php elseif ($course['is_free']): ?>
+                <span class="badge-popular">Free</span>
+                <?php endif; ?>
               </div>
-              <h3>Cybersecurity</h3>
-              <p>Learn to protect systems, networks, and data from cyber threats. Master ethical hacking, penetration testing, and security analysis.</p>
+              <h3><?= htmlspecialchars($course['title']) ?></h3>
+              <p><?= htmlspecialchars($course['description']) ?></p>
+              <?php if (!empty($course['features'])): ?>
               <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> Ethical Hacking & Pen Testing</li>
-                <li><i class="bi bi-check-circle"></i> Network Security</li>
-                <li><i class="bi bi-check-circle"></i> Security Compliance</li>
+                <?php foreach ($course['features'] as $feature): ?>
+                <li><i class="bi bi-check-circle"></i> <?= htmlspecialchars($feature) ?></li>
+                <?php endforeach; ?>
               </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
+              <?php endif; ?>
+              <a href="student/course/<?= htmlspecialchars($course['slug']) ?>" class="service-cta">
+                <span>View Course</span>
                 <i class="bi bi-arrow-right"></i>
               </a>
             </div>
           </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item">
-              <div class="service-header">
-                <div class="icon-wrapper">
-                  <i class="bi bi-gear-wide-connected"></i>
-                </div>
-                <span class="badge-popular">Coming Soon</span>
-              </div>
-              <h3>DevOps Engineering</h3>
-              <p>Bridge the gap between development and operations. Learn CI/CD pipelines, containerization, and infrastructure automation.</p>
-              <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> CI/CD Pipelines</li>
-                <li><i class="bi bi-check-circle"></i> Docker & Kubernetes</li>
-                <li><i class="bi bi-check-circle"></i> Infrastructure as Code</li>
-              </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
-            <div class="service-item">
-              <div class="service-header">
-                <div class="icon-wrapper">
-                  <i class="bi bi-cloud"></i>
-                </div>
-                <span class="badge-popular">Coming Soon</span>
-              </div>
-              <h3>Cloud Computing</h3>
-              <p>Master cloud platforms like AWS, Azure, and Google Cloud. Learn to design, deploy, and manage scalable cloud solutions.</p>
-              <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> AWS, Azure & GCP</li>
-                <li><i class="bi bi-check-circle"></i> Cloud Architecture</li>
-                <li><i class="bi bi-check-circle"></i> Serverless Computing</li>
-              </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
-            <div class="service-item">
-              <div class="service-header">
-                <div class="icon-wrapper">
-                  <i class="bi bi-bar-chart-line"></i>
-                </div>
-                <span class="badge-popular">Coming Soon</span>
-              </div>
-              <h3>Data Science & AI</h3>
-              <p>Unlock the power of data with machine learning, data analysis, and AI. Transform raw data into actionable business insights.</p>
-              <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> Machine Learning</li>
-                <li><i class="bi bi-check-circle"></i> Data Analysis & Visualization</li>
-                <li><i class="bi bi-check-circle"></i> Python & R Programming</li>
-              </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item">
-              <div class="service-header">
-                <div class="icon-wrapper">
-                  <i class="bi bi-code-slash"></i>
-                </div>
-                <span class="badge-popular">Coming Soon</span>
-              </div>
-              <h3>Software Development</h3>
-              <p>Build robust applications from scratch. Learn modern programming languages, frameworks, and software engineering best practices.</p>
-              <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> Full-Stack Development</li>
-                <li><i class="bi bi-check-circle"></i> API Development</li>
-                <li><i class="bi bi-check-circle"></i> Agile Methodologies</li>
-              </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
-            <div class="service-item">
-              <div class="service-header">
-                <div class="icon-wrapper">
-                  <i class="bi bi-hdd-network"></i>
-                </div>
-                <span class="badge-popular">Coming Soon</span>
-              </div>
-              <h3>System Administration</h3>
-              <p>Master Linux, Windows Server, and network administration. Learn to manage, maintain, and secure enterprise IT infrastructure.</p>
-              <ul class="feature-list">
-                <li><i class="bi bi-check-circle"></i> Linux & Windows Server</li>
-                <li><i class="bi bi-check-circle"></i> Network Administration</li>
-                <li><i class="bi bi-check-circle"></i> Virtualization</li>
-              </ul>
-              <a href="#contact" class="service-cta">
-                <span>Enroll Now</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </div>
+          <?php $delay += 50; endforeach; ?>
+          <?php endif; ?>
 
         </div>
 
