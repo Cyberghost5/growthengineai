@@ -87,9 +87,13 @@ class Paystack {
             ];
         }
         
+        // Log the full response for debugging
+        error_log("Paystack initialization failed. Full response: " . json_encode($response));
+        
         return [
             'success' => false,
-            'message' => $response['message'] ?? 'Failed to initialize payment'
+            'message' => $response['message'] ?? 'Failed to initialize payment',
+            'debug_response' => $response
         ];
     }
     
@@ -120,9 +124,13 @@ class Paystack {
             'paystack_response' => json_encode($response)
         ]);
         
+        // Log the full response for debugging
+        error_log("Paystack verification failed. Full response: " . json_encode($response));
+        
         return [
             'success' => false,
-            'message' => $response['message'] ?? 'Payment verification failed'
+            'message' => $response['message'] ?? 'Payment verification failed',
+            'debug_response' => $response
         ];
     }
     
@@ -149,11 +157,15 @@ class Paystack {
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
         
         if ($httpCode === 200) {
             return json_decode($response, true);
         }
+        
+        // Log API errors
+        error_log("Paystack API Error - Endpoint: {$endpoint}, HTTP Code: {$httpCode}, Response: {$response}, cURL Error: {$curlError}");
         
         return null;
     }
