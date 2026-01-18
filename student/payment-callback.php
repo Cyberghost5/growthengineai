@@ -37,13 +37,21 @@ if ($verification['success']) {
         'user_id' => $user['id'],
         'course_id' => $courseId,
         'amount' => $amount,
-        'status' => 'completed'
+        'status' => 'completed',
+        'email' => $user['email']
     ]);
     
     // Enroll the user in the course
     $courseModel->enrollUser($user['id'], $courseId, $amount);
     
-    echo json_encode(['success' => true]);
+    // Get course details for redirect
+    $course = $courseModel->getCourseById($courseId);
+    
+    // Redirect to the course with success message
+    header('Location: learn.php?slug=' . $course['slug'] . '&payment=success&message=' . urlencode('Payment successful! Welcome to the course!'));
+    exit;
 } else {
-    echo json_encode(['success' => false, 'message' => 'Payment verification failed']);
+    // Redirect back to courses with error message
+    header('Location: courses.php?payment=error&message=' . urlencode('Payment verification failed. Please contact support.'));
+    exit;
 }

@@ -758,7 +758,7 @@ foreach ($categoriesRaw as $cat) {
                                 callback: function(response) {
                                     // Payment successful
                                     showAlert('Payment successful! Redirecting...', 'success');
-                                    window.location.href = 'payment-callback.php?reference=' + response.reference;
+                                    window.location.href = 'payment-callback.php?reference=' + response.reference + '&course_id=' + courseId;
                                 },
                                 onClose: function() {
                                     // User closed payment modal
