@@ -796,7 +796,7 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                 this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
                 
                 // Make checkout request
-                fetch('<?php echo Url::base(); ?>/student/checkout.php', {
+                fetch('<?php echo Url::base(); ?>/student/checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

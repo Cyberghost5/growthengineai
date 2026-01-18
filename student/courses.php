@@ -718,7 +718,7 @@ foreach ($categoriesRaw as $cat) {
                 enrollButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
                 
                 // Make checkout request
-                fetch('<?php echo Url::base(); ?>/student/checkout.php', {
+                fetch('<?php echo Url::base(); ?>/student/checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
