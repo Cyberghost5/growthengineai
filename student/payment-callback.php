@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Course.php';
 require_once __DIR__ . '/../classes/Paystack.php';
-require_once __DIR__ . '/../classes/Url.php';
 
 $auth = new Auth();
 $auth->requireRole('student');
@@ -16,36 +15,35 @@ $user = $auth->getCurrentUser();
 $paystack = new Paystack();
 $courseModel = new Course();
 
-// Get payment reference from URL
+// Get payment reference and course ID from URL
 $reference = isset($_GET['reference']) ? trim($_GET['reference']) : '';
+$courseId = isset($_GET['course_id']) ? (int)$_GET['course_id'] : 0;
 
-if (empty($reference)) {
-    header('Location: ' . Url::courses() . '?payment=error&message=' . urlencode('Invalid payment reference'));
+if (empty($reference) || !$courseId) {
+    echo json_encode(['success' => false, 'message' => 'Invalid payment reference']);
     exit;
 }
 
-// Verify the payment
+// Verify the payment with Paystack
 $verification = $paystack->verifyPayment($reference);
 
 if ($verification['success']) {
-    $transaction = $verification['transaction'];
-    $courseId = $transaction['course_id'];
-    $amount = $transaction['amount'];
+    $transaction = $verification['data'];
+    $amount = $transaction['amount'] / 100; // Convert from kobo to naira
+    
+    // Save transaction to database
+    $paystack->saveTransaction([
+        'reference' => $reference,
+        'user_id' => $user['id'],
+        'course_id' => $courseId,
+        'amount' => $amount,
+        'status' => 'completed'
+    ]);
     
     // Enroll the user in the course
-    $enrollResult = $courseModel->enrollUser($user['id'], $courseId, $amount);
+    $courseModel->enrollUser($user['id'], $courseId, $amount);
     
-    if ($enrollResult['success']) {
-        // Get course details for redirect
-        $course = $courseModel->getCourseById($courseId);
-        
-        header('Location: ' . Url::learn($course['slug']) . '?payment=success&message=' . urlencode('Payment successful! Welcome to the course.'));
-        exit;
-    } else {
-        header('Location: ' . Url::courses() . '?payment=error&message=' . urlencode('Payment verified but enrollment failed. Please contact support.'));
-        exit;
-    }
+    echo json_encode(['success' => true]);
 } else {
-    header('Location: ' . Url::courses() . '?payment=failed&message=' . urlencode('Payment verification failed. Please try again or contact support.'));
-    exit;
+    echo json_encode(['success' => false, 'message' => 'Payment verification failed']);
 }

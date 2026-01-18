@@ -209,6 +209,24 @@ class Paystack {
     }
     
     /**
+     * Save transaction to database
+     */
+    public function saveTransaction($data) {
+        $currency = $this->settings->get('paystack_currency', 'NGN');
+        
+        return $this->createTransaction([
+            'reference' => $data['reference'],
+            'user_id' => $data['user_id'],
+            'course_id' => $data['course_id'],
+            'amount' => $data['amount'],
+            'currency' => $currency,
+            'status' => $data['status'],
+            'payment_method' => 'paystack',
+            'email' => $data['email'] ?? ''
+        ]);
+    }
+    
+    /**
      * Get transaction by reference
      */
     public function getTransactionByReference($reference) {
