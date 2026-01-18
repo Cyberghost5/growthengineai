@@ -141,9 +141,14 @@ class Paystack {
         $apiUrl = 'https://api.paystack.co';
         $url = $apiUrl . '/' . $endpoint;
         
+        // Log the request being sent (mask secret key)
+        $maskedKey = substr($this->secretKey, 0, 7) . '...' . substr($this->secretKey, -4);
+        error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$maskedKey}, Data: " . json_encode($data));
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification for local testing
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Authorization: Bearer ' . $this->secretKey,
             'Content-Type: application/json',
@@ -160,12 +165,24 @@ class Paystack {
         $curlError = curl_error($ch);
         curl_close($ch);
         
+        // Log the raw response
+        error_log("Paystack API Response - HTTP Code: {$httpCode}, Raw Response: {$response}");
+        
         if ($httpCode === 200) {
             return json_decode($response, true);
         }
         
-        // Log API errors
+        // Log API errors with more details
         error_log("Paystack API Error - Endpoint: {$endpoint}, HTTP Code: {$httpCode}, Response: {$response}, cURL Error: {$curlError}");
+        
+        // Try to decode error response
+        if ($response) {
+            $errorData = json_decode($response, true);
+            if ($errorData) {
+                error_log("Paystack Error Details: " . json_encode($errorData));
+                return $errorData; // Return error details instead of null
+            }
+        }
         
         return null;
     }
