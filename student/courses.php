@@ -649,7 +649,7 @@ foreach ($categoriesRaw as $cat) {
                                         </div>
                                         <div class="d-flex gap-2">
                                             <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll btn-sm enroll-btn">
-                                                <i class="bi bi-cart-plus me-1"></i>View
+                                                <i class="bi bi-cart-plus me-1"></i>Enroll
                                             </a>
                                         </div>
                                     </div>
