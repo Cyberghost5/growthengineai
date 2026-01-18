@@ -2,7 +2,8 @@
 # Enable clean URLs without .php extensions
 
 RewriteEngine On
-RewriteBase /growthengine1/
+RewriteBase /
+# RewriteBase /growthengine/
 
 # Remove trailing slash (except for directories)
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -67,3 +68,10 @@ AddDefaultCharset UTF-8
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
 </IfModule>
 
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php81” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php81 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

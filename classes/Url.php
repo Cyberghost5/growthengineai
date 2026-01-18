@@ -14,7 +14,8 @@ class Url {
         if (self::$baseUrl === null) {
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            self::$baseUrl = $protocol . '://' . $host . '/growthengine1';
+            // self::$baseUrl = $protocol . '://' . $host;
+            self::$baseUrl = $protocol . '://' . $host. '/growthengine';
         }
         return self::$baseUrl;
     }
@@ -62,6 +63,13 @@ class Url {
      */
     public static function settings() {
         return self::student('settings');
+    }
+    
+    /**
+     * Transactions URL
+     */
+    public static function transactions() {
+        return self::student('transactions');
     }
     
     /**

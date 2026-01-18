@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Course.php';
+require_once __DIR__ . '/../classes/Paystack.php';
 require_once __DIR__ . '/../classes/Url.php';
 
 $auth = new Auth();
@@ -12,6 +13,8 @@ $auth->requireRole('student');
 
 $user = $auth->getCurrentUser();
 $courseModel = new Course();
+$paystack = new Paystack();
+$paystackPublicKey = $paystack->getPublicKey();
 
 // Get enrolled courses from database
 $enrolledCoursesRaw = $courseModel->getEnrolledCourses($user['id']);
@@ -31,10 +34,20 @@ foreach ($enrolledCoursesRaw as $course) {
     ];
 }
 
-// Get available courses from database
+// Get enrolled course IDs for filtering
+$enrolledCourseIds = array_column($enrolledCoursesRaw, 'id');
+
+// Get available courses from database (excluding enrolled ones)
 $availableCoursesRaw = $courseModel->getAllCourses();
 $availableCourses = [];
 foreach ($availableCoursesRaw as $course) {
+    // Skip courses that user is already enrolled in
+    if (in_array($course['id'], $enrolledCourseIds)) {
+        continue;
+    }
+    
+    $price = $course['is_free'] ? 0 : ($course['sale_price'] > 0 ? $course['sale_price'] : $course['price']);
+    
     $availableCourses[] = [
         'id' => $course['id'],
         'slug' => $course['slug'] ?? Url::slugify($course['title']),
@@ -48,7 +61,11 @@ foreach ($availableCoursesRaw as $course) {
         'level' => ucfirst($course['level']),
         'category' => $course['category_name'],
         'rating' => $course['average_rating'] ?? 0,
-        'students' => $course['total_enrollments'] ?? 0
+        'students' => $course['total_enrollments'] ?? 0,
+        'is_free' => $course['is_free'],
+        'price' => $price,
+        'original_price' => $course['price'],
+        'sale_price' => $course['sale_price']
     ];
 }
 
@@ -306,6 +323,20 @@ foreach ($categoriesRaw as $cat) {
             color: white;
             transform: translateY(-2px);
         }
+        .btn-enroll:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-outline-secondary {
+            border-color: #cbd5e1;
+            color: #64748b;
+        }
+        .btn-outline-secondary:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #475569;
+        }
         .btn-continue {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
@@ -461,6 +492,9 @@ foreach ($categoriesRaw as $cat) {
     </div>
 
     <div class="container-fluid px-4">
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+        
         <div class="row g-4">
             <!-- Sidebar Overlay -->
             <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -480,6 +514,9 @@ foreach ($categoriesRaw as $cat) {
                         </a>
                         <a class="nav-link active" href="<?php echo Url::courses(); ?>">
                             <i class="bi bi-book"></i> My Courses
+                        </a>
+                        <a class="nav-link" href="<?php echo Url::transactions(); ?>">
+                            <i class="bi bi-receipt"></i> Transactions
                         </a>
                         <a class="nav-link" href="<?php echo Url::community(); ?>">
                             <i class="bi bi-people"></i> Community
@@ -597,10 +634,27 @@ foreach ($categoriesRaw as $cat) {
                                         <span class="course-rating"><i class="bi bi-star-fill me-1"></i><?php echo $course['rating']; ?></span>
                                     </div>
                                     <div class="course-stats">
-                                        <span><i class="bi bi-people me-1"></i><?php echo number_format($course['students']); ?> students</span>
-                                        <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll btn-sm">
-                                            <i class="bi bi-eye me-1"></i>View Course
-                                        </a>
+                                        <div>
+                                            <span><i class="bi bi-people me-1"></i><?php echo number_format($course['students']); ?> students</span>
+                                            <div class="mt-2">
+                                                <?php if ($course['is_free']): ?>
+                                                    <span class="badge bg-success">Free</span>
+                                                <?php else: ?>
+                                                    <strong class="text-primary">₦<?php echo number_format($course['price'], 2); ?></strong>
+                                                    <?php if ($course['sale_price'] > 0 && $course['sale_price'] < $course['original_price']): ?>
+                                                        <small class="text-muted text-decoration-line-through ms-2">₦<?php echo number_format($course['original_price'], 2); ?></small>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                            <button class="btn btn-enroll btn-sm enroll-btn" data-course-id="<?php echo $course['id']; ?>" data-course-title="<?php echo htmlspecialchars($course['title']); ?>" data-price="<?php echo $course['price']; ?>" data-is-free="<?php echo $course['is_free'] ? '1' : '0'; ?>">
+                                                <i class="bi bi-cart-plus me-1"></i>Enroll
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -613,7 +667,124 @@ foreach ($categoriesRaw as $cat) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
+        // Show payment notification alerts
+        const urlParams = new URLSearchParams(window.location.search);
+        const payment = urlParams.get('payment');
+        const message = urlParams.get('message');
+
+        if (payment && message) {
+            showAlert(decodeURIComponent(message), payment === 'success' ? 'success' : 'danger');
+            // Remove query params
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('alertContainer').insertAdjacentHTML('beforeend', alertHtml);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Handle course enrollment with Paystack
+        document.querySelectorAll('.enroll-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const courseId = this.getAttribute('data-course-id');
+                const courseTitle = this.getAttribute('data-course-title');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const isFree = this.getAttribute('data-is-free') === '1';
+                
+                console.log('Enrolling in course:', { courseId, courseTitle, price, isFree });
+                
+                // Store button reference
+                const enrollButton = this;
+                
+                // Disable button
+                enrollButton.disabled = true;
+                enrollButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
+                
+                // Make checkout request
+                fetch('<?php echo Url::base(); ?>/student/checkout.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `course_id=${courseId}`
+                })
+                .then(response => {
+                    // Check if response is ok
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (data.free_course) {
+                            // Free course - redirect directly
+                            showAlert(data.message, 'success');
+                            setTimeout(() => {
+                                window.location.href = data.redirect;
+                            }, 1000);
+                        } else if (data.payment_required) {
+                            // Paid course - initialize Paystack
+                            const handler = PaystackPop.setup({
+                                key: '<?php echo $paystackPublicKey; ?>',
+                                email: '<?php echo $user['email']; ?>',
+                                amount: price * 100, // Convert to kobo
+                                currency: 'NGN',
+                                ref: data.reference,
+                                callback: function(response) {
+                                    // Payment successful
+                                    showAlert('Payment successful! Redirecting...', 'success');
+                                    window.location.href = 'payment-callback.php?reference=' + response.reference;
+                                },
+                                onClose: function() {
+                                    // User closed payment modal
+                                    showAlert('Payment cancelled', 'warning');
+                                    // Re-enable button
+                                    enrollButton.disabled = false;
+                                    enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
+                                }
+                            });
+                            handler.openIframe();
+                        }
+                    } else {
+                        showAlert(data.message, 'danger');
+                        // Re-enable button
+                        enrollButton.disabled = false;
+                        enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred. Please try again.', 'danger');
+                    // Re-enable button
+                    enrollButton.disabled = false;
+                    enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';
+                });
+            });
+        });
+
         // Filter functionality
         document.querySelectorAll('.filter-tab').forEach(tab => {
             tab.addEventListener('click', function() {

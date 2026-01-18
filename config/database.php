@@ -8,14 +8,21 @@
 
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'growthengine_lms');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'growthen_lms');
+define('DB_USER', 'growthen_lms');
+define('DB_PASS', 'growthen_lms');
 define('DB_CHARSET', 'utf8mb4');
+
+// define('DB_HOST', 'localhost');
+// define('DB_NAME', 'growthen_lms');
+// define('DB_USER', 'root');
+// define('DB_PASS', '');
+// define('DB_CHARSET', 'utf8mb4');
 
 // Site configuration
 define('SITE_NAME', 'GrowthEngineAI');
 define('SITE_URL', 'https://growthengineai.org');
+// define('SITE_URL', 'http://localhost/growthengine');
 define('SITE_EMAIL', 'info@growthengineai.org');
 
 // Define logo links

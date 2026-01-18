@@ -238,6 +238,9 @@ $enrolledCourses = $courseModel->getEnrolledCourses($user['id']);
                         <a class="nav-link" href="<?php echo Url::courses(); ?>">
                             <i class="bi bi-book"></i> My Courses
                         </a>
+                        <a class="nav-link" href="<?php echo Url::transactions(); ?>">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
                         <a class="nav-link" href="<?php echo Url::community(); ?>">
                             <i class="bi bi-people"></i> Community
                         </a>

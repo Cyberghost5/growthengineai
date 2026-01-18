@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/Course.php';
+require_once __DIR__ . '/../classes/Paystack.php';
 require_once __DIR__ . '/../classes/Url.php';
 
 $auth = new Auth();
@@ -12,6 +13,8 @@ $auth->requireRole('student');
 
 $user = $auth->getCurrentUser();
 $courseModel = new Course();
+$paystack = new Paystack();
+$paystackPublicKey = $paystack->getPublicKey();
 
 // Get course by slug or ID from URL
 $courseSlug = isset($_GET['slug']) ? trim($_GET['slug']) : null;
@@ -71,7 +74,11 @@ $course = [
     'last_updated' => $courseData['updated_at'] ? date('Y-m-d', strtotime($courseData['updated_at'])) : date('Y-m-d'),
     'enrolled' => $isEnrolled,
     'progress' => $enrollment['progress_percent'] ?? 0,
-    'price' => $courseData['is_free'] ? 'Free' : '$' . number_format($courseData['price'], 2),
+    'is_free' => $courseData['is_free'],
+    'price' => $courseData['is_free'] ? 0 : ($courseData['sale_price'] > 0 ? $courseData['sale_price'] : $courseData['price']),
+    'price_display' => $courseData['is_free'] ? 'Free' : '₦' . number_format($courseData['is_free'] ? 0 : ($courseData['sale_price'] > 0 ? $courseData['sale_price'] : $courseData['price']), 2),
+    'original_price' => $courseData['price'],
+    'sale_price' => $courseData['sale_price'],
     'modules' => [],
     'what_you_learn' => $courseData['what_you_learn'] ?? [],
     'requirements' => $courseData['requirements'] ?? []
@@ -526,6 +533,9 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
     </div>
 
     <div class="container">
+        <!-- Alert Container -->
+        <div id="alertContainer" class="mb-3"></div>
+        
         <div class="row g-4">
             <!-- Main Content -->
             <div class="col-lg-8">
@@ -687,12 +697,12 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                             </a>
                         <?php else: ?>
                             <div class="course-price mb-3">
-                                <?php echo $course['price']; ?>
-                                <?php if ($course['price'] !== 'Free'): ?>
-                                <span class="original">$199.99</span>
+                                <?php echo $course['price_display']; ?>
+                                <?php if (!$course['is_free'] && $course['sale_price'] > 0 && $course['sale_price'] < $course['original_price']): ?>
+                                <span class="original">₦<?php echo number_format($course['original_price'], 2); ?></span>
                                 <?php endif; ?>
                             </div>
-                            <button class="btn-enroll mb-3" onclick="enrollCourse('<?php echo $course['slug']; ?>')">
+                            <button class="btn-enroll mb-3" id="enrollBtn" data-course-id="<?php echo $course['id']; ?>" data-course-slug="<?php echo $course['slug']; ?>" data-price="<?php echo $course['price']; ?>" data-is-free="<?php echo $course['is_free'] ? '1' : '0'; ?>">
                                 <i class="bi bi-cart-plus me-2"></i>Enroll Now
                             </button>
                         <?php endif; ?>
@@ -737,34 +747,120 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
     <div style="height: 60px;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
-        function enrollCourse(courseSlug) {
-            if (confirm('Are you sure you want to enroll in this course?')) {
-                const formData = new FormData();
-                formData.append('course_slug', courseSlug);
+        // Show payment notification alerts
+        const urlParams = new URLSearchParams(window.location.search);
+        const payment = urlParams.get('payment');
+        const message = urlParams.get('message');
+
+        if (payment && message) {
+            showAlert(decodeURIComponent(message), payment === 'success' ? 'success' : 'danger');
+            // Remove query params
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace(/[?&](payment|message)=[^&]*/g, '').replace(/^&/, '?'));
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('alertContainer').insertAdjacentHTML('beforeend', alertHtml);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Handle course enrollment with Paystack
+        const enrollBtn = document.getElementById('enrollBtn');
+        if (enrollBtn) {
+            enrollBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 
-                fetch('<?php echo Url::base(); ?>/student/enroll', {
+                const courseId = this.getAttribute('data-course-id');
+                const courseSlug = this.getAttribute('data-course-slug');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const isFree = this.getAttribute('data-is-free') === '1';
+                
+                console.log('Enrolling in course:', { courseId, courseSlug, price, isFree });
+                
+                // Disable button
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                
+                // Make checkout request
+                fetch('<?php echo Url::base(); ?>/student/checkout.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `course_id=${courseId}`
                 })
-                .then(response => response.json())
+                .then(response => {
+                    // Check if response is ok
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            window.location.reload();
+                        if (data.free_course) {
+                            // Free course - redirect directly
+                            showAlert(data.message, 'success');
+                            setTimeout(() => {
+                                window.location.href = data.redirect;
+                            }, 1000);
+                        } else if (data.payment_required) {
+                            // Paid course - initialize Paystack
+                            const handler = PaystackPop.setup({
+                                key: '<?php echo $paystackPublicKey; ?>',
+                                email: '<?php echo $user['email']; ?>',
+                                amount: price * 100, // Convert to kobo
+                                currency: 'NGN',
+                                ref: data.reference,
+                                callback: function(response) {
+                                    // Payment successful
+                                    showAlert('Payment successful! Redirecting...', 'success');
+                                    window.location.href = 'payment-callback.php?reference=' + response.reference;
+                                },
+                                onClose: function() {
+                                    // User closed payment modal
+                                    showAlert('Payment cancelled', 'warning');
+                                    // Re-enable button
+                                    enrollBtn.disabled = false;
+                                    enrollBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Enroll Now';
+                                }
+                            });
+                            handler.openIframe();
                         }
                     } else {
-                        alert('Error: ' + data.message);
+                        showAlert(data.message, 'danger');
+                        // Re-enable button
+                        this.disabled = false;
+                        this.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Enroll Now';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    showAlert('An error occurred. Please try again.', 'danger');
+                    // Re-enable button
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Enroll Now';
                 });
-            }
+            });
         }
     </script>
 </body>

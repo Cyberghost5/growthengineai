@@ -110,7 +110,11 @@ foreach ($courseDataDB['modules'] as $module) {
             $options = [];
             $correctIndex = 0;
             foreach ($q['options'] as $idx => $opt) {
-                $options[] = $opt['option_text'];
+                $options[] = [
+                    'id' => $opt['id'],
+                    'option_text' => $opt['option_text'],
+                    'is_correct' => $opt['is_correct']
+                ];
                 if ($opt['is_correct']) {
                     $correctIndex = $idx;
                 }
@@ -125,13 +129,22 @@ foreach ($courseDataDB['modules'] as $module) {
             ];
         }
         
+        // Check if user has passed this quiz
+        $quizPassed = false;
+        foreach ($userAttempts as $attempt) {
+            if ($attempt['is_passed']) {
+                $quizPassed = true;
+                break;
+            }
+        }
+        
         $moduleLessons[] = [
             'id' => 'quiz_' . $quiz['id'],
             'quiz_id' => $quiz['id'],
             'title' => $quiz['title'],
             'duration' => $quiz['total_questions'] . ' questions',
             'type' => 'quiz',
-            'completed' => false,
+            'completed' => $quizPassed,
             'time_limit' => $quiz['time_limit_minutes'] ?? 15,
             'passing_score' => $quiz['passing_score'] ?? 70,
             'attempts_allowed' => $quiz['max_attempts'] ?? 3,
@@ -144,20 +157,32 @@ foreach ($courseDataDB['modules'] as $module) {
     if ($module['assignment']) {
         $assignment = $module['assignment'];
         
+        // Check if user has submitted this assignment
+        $assignmentSubmissions = $courseModel->getAssignmentSubmissions($user['id'], $assignment['id']);
+        $hasSubmitted = !empty($assignmentSubmissions);
+        $latestSubmission = $hasSubmitted ? $assignmentSubmissions[0] : null;
+        $assignmentCompleted = $hasSubmitted && $latestSubmission && 
+            in_array($latestSubmission['status'], ['graded', 'submitted', 'under_review']);
+        
         $moduleLessons[] = [
             'id' => 'assignment_' . $assignment['id'],
             'assignment_id' => $assignment['id'],
             'title' => $assignment['title'],
             'duration' => ($assignment['due_days'] ?? 7) . ' days',
             'type' => 'assignment',
-            'completed' => false,
-            'submitted' => false,
-            'grade' => null,
+            'completed' => $assignmentCompleted,
+            'submitted' => $hasSubmitted,
+            'grade' => $latestSubmission['grade_percent'] ?? null,
             'due_date' => date('Y-m-d', strtotime('+' . ($assignment['due_days'] ?? 7) . ' days')),
             'description' => $assignment['description'] ?? '',
             'instructions' => $assignment['instructions'] ?? '',
             'max_points' => $assignment['max_points'] ?? 100,
-            'submission' => null
+            'submission' => $latestSubmission ? [
+                'file' => $latestSubmission['file_name'],
+                'submitted_at' => $latestSubmission['submitted_at'],
+                'feedback' => $latestSubmission['instructor_feedback'] ?? 'Pending review',
+                'grade' => $latestSubmission['grade_percent']
+            ] : null
         ];
     }
     
@@ -233,19 +258,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($action === 'submit_assignment') {
         // Handle assignment submission
-        if (isset($_FILES['assignment_file']) && $_FILES['assignment_file']['error'] === UPLOAD_ERR_OK) {
-            $message = 'Assignment submitted successfully! You will receive feedback within 48 hours.';
-            $messageType = 'success';
+        $assignmentId = isset($_POST['assignment_id']) ? (int)$_POST['assignment_id'] : 0;
+        
+        if ($assignmentId > 0) {
+            $submissionData = [
+                'text_content' => $_POST['text_content'] ?? null,
+                'submission_url' => $_POST['submission_url'] ?? null
+            ];
+            
+            // Handle file upload if present
+            if (isset($_FILES['assignment_file']) && $_FILES['assignment_file']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/../uploads/assignments/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                
+                $fileName = time() . '_' . $user['id'] . '_' . basename($_FILES['assignment_file']['name']);
+                $filePath = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['assignment_file']['tmp_name'], $filePath)) {
+                    $submissionData['file_url'] = '/uploads/assignments/' . $fileName;
+                    $submissionData['file_name'] = $_FILES['assignment_file']['name'];
+                    $submissionData['file_size'] = $_FILES['assignment_file']['size'];
+                }
+            }
+            
+            // Check if there's any content to submit
+            if (!empty($submissionData['file_url']) || !empty($submissionData['text_content']) || !empty($submissionData['submission_url'])) {
+                $result = $courseModel->submitAssignment($user['id'], $assignmentId, $submissionData);
+                
+                if ($result['success']) {
+                    $message = 'Assignment submitted successfully! You will receive feedback within 48 hours.';
+                    $messageType = 'success';
+                } else {
+                    $message = $result['message'];
+                    $messageType = 'danger';
+                }
+            } else {
+                $message = 'Please provide a file, text content, or URL for your submission.';
+                $messageType = 'danger';
+            }
         } else {
-            $message = 'Please select a file to upload.';
+            $message = 'Invalid assignment.';
             $messageType = 'danger';
         }
     }
     
     if ($action === 'submit_quiz') {
         // Handle quiz submission
-        $message = 'Quiz submitted successfully! Your score: 80%';
-        $messageType = 'success';
+        $quizId = isset($_POST['quiz_id']) ? (int)$_POST['quiz_id'] : 0;
+        
+        if ($quizId > 0) {
+            // Collect answers from POST data
+            $answers = [];
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, 'question_') === 0) {
+                    $questionId = (int)str_replace('question_', '', $key);
+                    $answers[$questionId] = (int)$value;
+                }
+            }
+            
+            $result = $courseModel->submitQuiz($user['id'], $quizId, $answers);
+            
+            if ($result['success']) {
+                $message = 'Quiz submitted successfully! Your score: ' . $result['score'] . '% - ' . ($result['passed'] ? 'Passed!' : 'Try again');
+                $messageType = $result['passed'] ? 'success' : 'warning';
+            } else {
+                $message = $result['message'];
+                $messageType = 'danger';
+            }
+        } else {
+            $message = 'Invalid quiz.';
+            $messageType = 'danger';
+        }
     }
     
     if ($action === 'mark_complete') {
@@ -936,14 +1021,15 @@ if (isset($_GET['completed']) && $_GET['completed'] == '1') {
 
                     <form method="POST" id="quizForm">
                         <input type="hidden" name="action" value="submit_quiz">
+                        <input type="hidden" name="quiz_id" value="<?php echo $currentLesson['quiz_id']; ?>">
                         <?php foreach ($currentLesson['questions'] as $index => $question): ?>
                         <div class="question-card">
                             <div class="question-number">Question <?php echo $index + 1; ?> of <?php echo count($currentLesson['questions']); ?></div>
                             <div class="question-text"><?php echo htmlspecialchars($question['question']); ?></div>
                             <?php foreach ($question['options'] as $optIndex => $option): ?>
                             <label class="answer-option">
-                                <input type="radio" name="q<?php echo $question['id']; ?>" value="<?php echo $optIndex; ?>" required>
-                                <span><?php echo htmlspecialchars($option); ?></span>
+                                <input type="radio" name="question_<?php echo $question['id']; ?>" value="<?php echo $option['id']; ?>" required>
+                                <span><?php echo htmlspecialchars($option['option_text']); ?></span>
                             </label>
                             <?php endforeach; ?>
                         </div>
@@ -995,6 +1081,7 @@ if (isset($_GET['completed']) && $_GET['completed'] == '1') {
                     <!-- Upload Form -->
                     <form method="POST" enctype="multipart/form-data" id="assignmentForm">
                         <input type="hidden" name="action" value="submit_assignment">
+                        <input type="hidden" name="assignment_id" value="<?php echo $currentLesson['assignment_id']; ?>">
                         <input type="file" name="assignment_file" id="assignmentFile" style="display: none;" accept=".pdf,.doc,.docx,.ipynb,.py,.zip">
                         <div class="upload-area" onclick="document.getElementById('assignmentFile').click()">
                             <i class="bi bi-cloud-arrow-up"></i>

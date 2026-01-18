@@ -357,7 +357,7 @@ class Course {
             return ['success' => false, 'message' => 'Already enrolled'];
         }
         
-        $sql = "INSERT INTO enrollments (user_id, course_id, price_paid, enrolled_at) 
+        $sql = "INSERT INTO enrollments (user_id, course_id, amount_paid, enrolled_at) 
                 VALUES (?, ?, ?, NOW())";
         
         $stmt = $this->db->prepare($sql);
@@ -400,6 +400,25 @@ class Course {
      * Mark lesson as completed
      */
     public function markLessonComplete($userId, $lessonId) {
+        // Get course ID from lesson to find enrollment
+        $sql = "SELECT m.course_id 
+                FROM lessons l 
+                JOIN modules m ON l.module_id = m.id 
+                WHERE l.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$lessonId]);
+        $result = $stmt->fetch();
+        
+        if (!$result) return false;
+        
+        $courseId = $result['course_id'];
+        
+        // Get enrollment ID
+        $enrollment = $this->getEnrollment($userId, $courseId);
+        if (!$enrollment) return false;
+        
+        $enrollmentId = $enrollment['id'];
+        
         // Check if progress exists
         $existing = $this->getLessonProgress($userId, $lessonId);
         
@@ -407,13 +426,14 @@ class Course {
             $sql = "UPDATE lesson_progress 
                     SET is_completed = 1, completed_at = NOW(), watch_time_seconds = duration_seconds
                     WHERE user_id = ? AND lesson_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$userId, $lessonId]);
         } else {
-            $sql = "INSERT INTO lesson_progress (user_id, lesson_id, is_completed, completed_at) 
-                    VALUES (?, ?, 1, NOW())";
+            $sql = "INSERT INTO lesson_progress (user_id, lesson_id, enrollment_id, is_completed, completed_at) 
+                    VALUES (?, ?, ?, 1, NOW())";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$userId, $lessonId, $enrollmentId]);
         }
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$userId, $lessonId]);
         
         // Update enrollment progress
         $this->updateEnrollmentProgress($userId, $lessonId);
@@ -475,6 +495,196 @@ class Course {
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$userId, $quizId]);
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Submit a quiz attempt
+     */
+    public function submitQuiz($userId, $quizId, $answers) {
+        // Get the quiz details
+        $quiz = $this->getQuizById($quizId);
+        if (!$quiz) {
+            return ['success' => false, 'message' => 'Quiz not found'];
+        }
+        
+        // Get course ID from quiz's module
+        $sql = "SELECT m.course_id FROM quizzes q 
+                JOIN modules m ON q.module_id = m.id 
+                WHERE q.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$quizId]);
+        $result = $stmt->fetch();
+        
+        if (!$result) {
+            return ['success' => false, 'message' => 'Quiz module not found'];
+        }
+        
+        $courseId = $result['course_id'];
+        
+        // Get enrollment
+        $enrollment = $this->getEnrollment($userId, $courseId);
+        if (!$enrollment) {
+            return ['success' => false, 'message' => 'Not enrolled in this course'];
+        }
+        
+        // Count previous attempts
+        $sql = "SELECT COUNT(*) as count FROM quiz_attempts WHERE user_id = ? AND quiz_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $quizId]);
+        $attemptNumber = $stmt->fetch()['count'] + 1;
+        
+        // Calculate score
+        $pointsEarned = 0;
+        $pointsPossible = 0;
+        $gradedAnswers = [];
+        
+        foreach ($quiz['questions'] as $question) {
+            $pointsPossible += $question['points'];
+            $questionId = $question['id'];
+            $userAnswer = $answers[$questionId] ?? null;
+            
+            $isCorrect = false;
+            if ($userAnswer !== null) {
+                // Find correct option
+                foreach ($question['options'] as $option) {
+                    if ($option['is_correct'] && $option['id'] == $userAnswer) {
+                        $isCorrect = true;
+                        $pointsEarned += $question['points'];
+                        break;
+                    }
+                }
+            }
+            
+            $gradedAnswers[$questionId] = [
+                'selected' => $userAnswer,
+                'is_correct' => $isCorrect,
+                'points' => $isCorrect ? $question['points'] : 0
+            ];
+        }
+        
+        $score = $pointsPossible > 0 ? round(($pointsEarned / $pointsPossible) * 100, 2) : 0;
+        $isPassed = $score >= ($quiz['passing_score'] ?? 70);
+        
+        // Insert quiz attempt
+        $sql = "INSERT INTO quiz_attempts 
+                (user_id, quiz_id, enrollment_id, attempt_number, submitted_at, 
+                 score, points_earned, points_possible, is_passed, status, answers) 
+                VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, 'graded', ?)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $userId, 
+            $quizId, 
+            $enrollment['id'], 
+            $attemptNumber,
+            $score,
+            $pointsEarned,
+            $pointsPossible,
+            $isPassed ? 1 : 0,
+            json_encode($gradedAnswers)
+        ]);
+        
+        $attemptId = $this->db->lastInsertId();
+        
+        // Update enrollment quiz completion count if passed
+        if ($isPassed) {
+            $sql = "UPDATE enrollments SET completed_quizzes = completed_quizzes + 1 
+                    WHERE id = ? AND user_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$enrollment['id'], $userId]);
+        }
+        
+        return [
+            'success' => true, 
+            'score' => $score, 
+            'passed' => $isPassed,
+            'points_earned' => $pointsEarned,
+            'points_possible' => $pointsPossible,
+            'attempt_id' => $attemptId
+        ];
+    }
+    
+    /**
+     * Submit an assignment
+     */
+    public function submitAssignment($userId, $assignmentId, $data) {
+        // Get assignment details
+        $assignment = $this->getAssignmentById($assignmentId);
+        if (!$assignment) {
+            return ['success' => false, 'message' => 'Assignment not found'];
+        }
+        
+        // Get course ID from assignment's module
+        $sql = "SELECT m.course_id FROM assignments a 
+                JOIN modules m ON a.module_id = m.id 
+                WHERE a.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$assignmentId]);
+        $result = $stmt->fetch();
+        
+        if (!$result) {
+            return ['success' => false, 'message' => 'Assignment module not found'];
+        }
+        
+        $courseId = $result['course_id'];
+        
+        // Get enrollment
+        $enrollment = $this->getEnrollment($userId, $courseId);
+        if (!$enrollment) {
+            return ['success' => false, 'message' => 'Not enrolled in this course'];
+        }
+        
+        // Count previous submissions
+        $sql = "SELECT COUNT(*) as count FROM assignment_submissions WHERE user_id = ? AND assignment_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $assignmentId]);
+        $submissionNumber = $stmt->fetch()['count'] + 1;
+        
+        // Insert assignment submission
+        $sql = "INSERT INTO assignment_submissions 
+                (user_id, assignment_id, enrollment_id, submission_number, 
+                 file_url, file_name, file_size, text_content, submission_url, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted')";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $userId,
+            $assignmentId,
+            $enrollment['id'],
+            $submissionNumber,
+            $data['file_url'] ?? null,
+            $data['file_name'] ?? null,
+            $data['file_size'] ?? 0,
+            $data['text_content'] ?? null,
+            $data['submission_url'] ?? null
+        ]);
+        
+        $submissionId = $this->db->lastInsertId();
+        
+        // Update enrollment assignment completion count
+        $sql = "UPDATE enrollments SET completed_assignments = completed_assignments + 1 
+                WHERE id = ? AND user_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$enrollment['id'], $userId]);
+        
+        return [
+            'success' => true,
+            'submission_id' => $submissionId,
+            'message' => 'Assignment submitted successfully'
+        ];
+    }
+    
+    /**
+     * Get user's assignment submissions
+     */
+    public function getAssignmentSubmissions($userId, $assignmentId) {
+        $sql = "SELECT * FROM assignment_submissions 
+                WHERE user_id = ? AND assignment_id = ? 
+                ORDER BY submitted_at DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $assignmentId]);
         return $stmt->fetchAll();
     }
     
