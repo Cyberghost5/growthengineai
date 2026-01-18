@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($publicKey && $secretKey) {
         $settings->set('paystack_public_key', $publicKey, 'text', 'payment', 'Paystack Public Key', false);
-        $settings->set('paystack_secret_key', $secretKey, 'text', 'payment', 'Paystack Secret Key', true);
+        $settings->set('paystack_secret_key', $secretKey, 'text', 'payment', 'Paystack Secret Key', false);
         $settings->set('paystack_mode', $mode, 'text', 'payment', 'Paystack Mode (test/live)', false);
         $settings->set('paystack_currency', $currency, 'text', 'payment', 'Payment Currency', false);
         
