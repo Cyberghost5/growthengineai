@@ -533,8 +533,6 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
     </div>
 
     <div class="container">
-        <!-- Alert Container -->
-        <div id="alertContainer" class="mb-3"></div>
         
         <div class="row g-4">
             <!-- Main Content -->
@@ -706,6 +704,8 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                                 <i class="bi bi-cart-plus me-2"></i>Enroll Now
                             </button>
                         <?php endif; ?>
+                        <!-- Alert Container -->
+                        <div id="alertContainer" class="mb-3"></div>
                         
                         <p class="text-center text-muted mb-0" style="font-size: 13px;">
                             <i class="bi bi-shield-check me-1"></i>30-Day Money-Back Guarantee
