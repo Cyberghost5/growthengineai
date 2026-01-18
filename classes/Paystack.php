@@ -143,7 +143,8 @@ class Paystack {
         
         // Log the request being sent (mask secret key)
         $maskedKey = substr($this->secretKey, 0, 7) . '...' . substr($this->secretKey, -4);
-        error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$maskedKey}, Data: " . json_encode($data));
+        // error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$maskedKey}, Data: " . json_encode($data));
+        error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$this->secretKey}, Data: " . json_encode($data));
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
