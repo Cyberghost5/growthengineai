@@ -738,6 +738,8 @@ foreach ($categoriesRaw as $cat) {
                     return response.json();
                 })
                 .then(data => {
+                    console.log('Checkout response:', data);
+                    
                     if (data.success) {
                         if (data.free_course) {
                             // Free course - redirect directly
@@ -769,7 +771,16 @@ foreach ($categoriesRaw as $cat) {
                             handler.openIframe();
                         }
                     } else {
+                        console.error('Checkout failed:', data);
                         showAlert(data.message, 'danger');
+                        
+                        // Show detailed error if available
+                        if (data.error_type) {
+                            console.error('Error Type:', data.error_type);
+                            console.error('Error File:', data.error_file + ':' + data.error_line);
+                            console.error('Stack Trace:', data.trace);
+                        }
+                        
                         // Re-enable button
                         enrollButton.disabled = false;
                         enrollButton.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Enroll';

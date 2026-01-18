@@ -4,6 +4,12 @@
  * Handles payment initialization for course enrollment
  */
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../logs/checkout_errors.log');
+
 // Prevent any output before JSON
 ob_start();
 
@@ -116,8 +122,17 @@ if ($paymentResult['success']) {
     // Catch any errors and return JSON
     ob_end_clean();
     header('Content-Type: application/json');
+    
+    // Log the full error
+    error_log("Checkout Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
     echo json_encode([
         'success' => false,
-        'message' => 'An error occurred: ' . $e->getMessage()
+        'message' => 'An error occurred: ' . $e->getMessage(),
+        'error_type' => get_class($e),
+        'error_file' => $e->getFile(),
+        'error_line' => $e->getLine(),
+        'trace' => $e->getTrace()
     ]);
 }
