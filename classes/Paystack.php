@@ -18,8 +18,8 @@ class Paystack {
         $this->settings = new Settings();
         
         // Load keys from database
-        $this->publicKey = $this->settings->get('paystack_public_key', 'pk_test_your_public_key_here');
-        $this->secretKey = $this->settings->get('paystack_secret_key', 'sk_test_your_secret_key_here');
+        $this->publicKey = $this->settings->get('paystack_public_key', 'YOUR_PAYSTACK_PUBLIC_KEY');
+        $this->secretKey = $this->settings->get('paystack_secret_key', 'YOUR_PAYSTACK_SECRET_KEY');
     }
     
     /**
