@@ -16,4 +16,4 @@ define('PAYSTACK_API_URL', 'https://api.paystack.co');
 define('PAYSTACK_CURRENCY', 'NGN'); // Nigerian Naira
 
 // Payment callback URL
-define('PAYSTACK_CALLBACK_URL', SITE_URL . '/student/payment-callback.php');
+define('PAYSTACK_CALLBACK_URL', SITE_URL . '/student/payment-callback');

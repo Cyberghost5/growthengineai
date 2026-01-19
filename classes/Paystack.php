@@ -41,7 +41,7 @@ class Paystack {
         
         // Get currency and callback URL from settings
         $currency = $this->settings->get('paystack_currency', 'NGN');
-        $callbackUrl = SITE_URL . '/student/payment-callback.php?course_id=' . $courseId;
+        $callbackUrl = SITE_URL . '/student/payment-callback?course_id=' . $courseId;
         
         // Prepare payment data
         $data = [

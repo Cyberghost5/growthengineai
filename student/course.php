@@ -834,7 +834,7 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                                 callback: function(response) {
                                     // Payment successful
                                     showAlert('Payment successful! Redirecting...', 'success');
-                                    window.location.href = 'payment-callback.php?reference=' + response.reference;
+                                    window.location.href = 'payment-callback?reference=' + response.reference;
                                 },
                                 onClose: function() {
                                     // User closed payment modal
