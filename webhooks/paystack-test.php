@@ -2,6 +2,7 @@
   // only a post with paystack signature header gets our attention
   if ((strtoupper($_SERVER['REQUEST_METHOD']) != 'POST' ) || !array_key_exists('HTTP_X_PAYSTACK_SIGNATURE', $_SERVER) ) 
      echo 'Yeeeeeeeeeeeeee';
+    var_dump( $_SERVER );
       exit();
 
   // Retrieve the request's body
