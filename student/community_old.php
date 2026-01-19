@@ -573,6 +573,80 @@ $benefits = [
                     </div>
                     <?php endforeach; ?>
                 </div>
+
+                <div class="row g-4">
+                    <!-- Channels Section -->
+                    <div class="col-lg-8">
+                        <h4 class="section-title"><i class="bi bi-hash me-2"></i>Popular Channels</h4>
+                        <div class="row g-3">
+                            <?php foreach ($channels as $channel): ?>
+                            <div class="col-md-6">
+                                <div class="channel-card" onclick="window.open('<?php echo htmlspecialchars($slackWorkspaceUrl); ?>', '_blank')">
+                                    <div class="channel-icon">
+                                        <i class="bi <?php echo $channel['icon']; ?>"></i>
+                                    </div>
+                                    <div class="channel-info">
+                                        <div class="channel-name"><?php echo htmlspecialchars($channel['name']); ?></div>
+                                        <p class="channel-desc"><?php echo htmlspecialchars($channel['description']); ?></p>
+                                        <div class="channel-members">
+                                            <i class="bi bi-people-fill"></i>
+                                            <?php echo number_format($channel['members']); ?> members
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Content -->
+                    <div class="col-lg-4">
+                        <!-- Community Guidelines -->
+                        <div class="guidelines-card mb-4">
+                            <h5><i class="bi bi-shield-check me-2"></i>Community Guidelines</h5>
+                            <ul>
+                                <li>Be respectful and supportive of all members</li>
+                                <li>No spam, self-promotion, or off-topic content</li>
+                                <li>Help others when you can - we all learn together</li>
+                                <li>Use appropriate channels for your questions</li>
+                                <li>Share knowledge and celebrate wins!</li>
+                            </ul>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="activity-feed">
+                            <h5 class="mb-3"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+                            <div class="activity-item">
+                                <div class="activity-avatar">AJ</div>
+                                <div class="activity-content">
+                                    <p><strong>Alex Johnson</strong> shared a project in #project-showcase</p>
+                                    <span class="activity-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">SM</div>
+                                <div class="activity-content">
+                                    <p><strong>Sarah Miller</strong> answered a question in #python-help</p>
+                                    <span class="activity-time">4 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">MK</div>
+                                <div class="activity-content">
+                                    <p><strong>Mike Kim</strong> joined the community</p>
+                                    <span class="activity-time">5 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">LC</div>
+                                <div class="activity-content">
+                                    <p><strong>Lisa Chen</strong> posted in #career-advice</p>
+                                    <span class="activity-time">6 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
