@@ -2,21 +2,18 @@
 /**
  * GrowthEngineAI LMS - Google OAuth Configuration
  * 
- * Configure your Google OAuth credentials here.
- * 
- * To get your credentials:
- * 1. Go to https://console.cloud.google.com/
- * 2. Create a new project or select existing one
- * 3. Go to APIs & Services > Credentials
- * 4. Click "Create Credentials" > "OAuth client ID"
- * 5. Select "Web application"
- * 6. Add authorized redirect URI: https://growthengineai.org/auth/google-callback
- * 7. Copy the Client ID and Client Secret below
+ * Google OAuth credentials are now stored in the database.
+ * Configure them via the admin panel at: /admin/oauth-settings.php
  */
 
-// Google OAuth Credentials
-define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID');     // Your Google Client ID
-define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET'); // Your Google Client Secret
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/../classes/Settings.php';
+
+$settings = new Settings();
+
+// Google OAuth Credentials (from database)
+define('GOOGLE_CLIENT_ID', $settings->get('google_client_id', ''));
+define('GOOGLE_CLIENT_SECRET', $settings->get('google_client_secret', ''));
 define('GOOGLE_REDIRECT_URI', SITE_URL . '/auth/google-callback');
 
 // Google OAuth URLs

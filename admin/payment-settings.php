@@ -51,7 +51,23 @@ $currency = $settings->get('paystack_currency', 'NGN');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.php">
+                <i class="bi bi-shield-lock me-2"></i>GrowthEngineAI Admin
+            </a>
+            <div>
+                <a href="oauth-settings.php" class="btn btn-outline-light btn-sm me-2">
+                    <i class="bi bi-google"></i> OAuth Settings
+                </a>
+                <a href="<?php echo Url::dashboard(); ?>" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container my-5">
         <div class="row">
             <div class="col-lg-8 mx-auto">
