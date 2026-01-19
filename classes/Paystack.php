@@ -101,35 +101,87 @@ class Paystack {
      * Verify a payment transaction
      */
     public function verifyPayment($reference) {
-        $response = $this->makeRequest("transaction/verify/{$reference}", 'GET');
+        error_log("=== PAYSTACK VERIFICATION START ===");
+        error_log("Verifying reference: {$reference}");
         
-        if ($response && $response['status'] && $response['data']['status'] === 'success') {
-            // Update transaction in database
+        // First check if transaction exists in our database
+        $existingTransaction = $this->getTransactionByReference($reference);
+        if (!$existingTransaction) {
+            error_log("ERROR: Transaction not found in database for reference: {$reference}");
+            return [
+                'success' => false,
+                'message' => 'Transaction not found in our records'
+            ];
+        }
+        
+        error_log("Transaction found in DB - ID: {$existingTransaction['id']}, Status: {$existingTransaction['status']}");
+        
+        // If already completed, return success without re-verifying
+        if ($existingTransaction['status'] === 'completed') {
+            error_log("Transaction already completed, returning cached result");
+            return [
+                'success' => true,
+                'data' => json_decode($existingTransaction['paystack_response'] ?? '{}', true),
+                'transaction' => $existingTransaction,
+                'cached' => true
+            ];
+        }
+        
+        // Call Paystack API
+        $response = $this->makeRequest("transaction/verify/" . urlencode($reference), 'GET');
+        
+        error_log("Paystack API response received: " . json_encode($response));
+        
+        // Check for API success
+        if ($response && isset($response['status']) && $response['status'] === true) {
+            $paymentStatus = $response['data']['status'] ?? 'unknown';
+            error_log("Payment status from Paystack: {$paymentStatus}");
+            
+            if ($paymentStatus === 'success') {
+                // Update transaction in database
+                $updateResult = $this->updateTransaction($reference, [
+                    'status' => 'completed',
+                    'paid_at' => date('Y-m-d H:i:s'),
+                    'paystack_response' => json_encode($response['data'])
+                ]);
+                
+                error_log("Transaction update result: " . ($updateResult ? 'SUCCESS' : 'FAILED'));
+                
+                // Fetch updated transaction
+                $updatedTransaction = $this->getTransactionByReference($reference);
+                error_log("Updated transaction status: " . ($updatedTransaction['status'] ?? 'NOT FOUND'));
+                
+                error_log("=== PAYSTACK VERIFICATION SUCCESS ===");
+                
+                return [
+                    'success' => true,
+                    'data' => $response['data'],
+                    'transaction' => $updatedTransaction
+                ];
+            }
+            
+            // Payment not successful (abandoned, failed, etc.)
+            error_log("Payment not successful - Status: {$paymentStatus}");
             $this->updateTransaction($reference, [
-                'status' => 'completed',
-                'paid_at' => date('Y-m-d H:i:s'),
+                'status' => 'failed',
                 'paystack_response' => json_encode($response['data'])
             ]);
             
             return [
-                'success' => true,
-                'data' => $response['data'],
-                'transaction' => $this->getTransactionByReference($reference)
+                'success' => false,
+                'message' => 'Payment was not successful. Status: ' . $paymentStatus,
+                'payment_status' => $paymentStatus
             ];
         }
         
-        // Update as failed
-        $this->updateTransaction($reference, [
-            'status' => 'failed',
-            'paystack_response' => json_encode($response)
-        ]);
-        
-        // Log the full response for debugging
-        error_log("Paystack verification failed. Full response: " . json_encode($response));
+        // API call failed or returned error
+        $errorMessage = $response['message'] ?? 'Unknown error from payment gateway';
+        error_log("Paystack API error: {$errorMessage}");
+        error_log("=== PAYSTACK VERIFICATION FAILED ===");
         
         return [
             'success' => false,
-            'message' => $response['message'] ?? 'Payment verification failed',
+            'message' => $errorMessage,
             'debug_response' => $response
         ];
     }
@@ -141,15 +193,17 @@ class Paystack {
         $apiUrl = 'https://api.paystack.co';
         $url = $apiUrl . '/' . $endpoint;
         
-        // Log the request being sent (mask secret key)
-        $maskedKey = substr($this->secretKey, 0, 7) . '...' . substr($this->secretKey, -4);
-        // error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$maskedKey}, Data: " . json_encode($data));
-        error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, API Key: {$this->secretKey}, Data: " . json_encode($data));
+        // Log the request being sent (mask secret key for security)
+        $maskedKey = substr($this->secretKey, 0, 10) . '...' . substr($this->secretKey, -4);
+        error_log("Paystack API Request - Endpoint: {$endpoint}, Method: {$method}, Key: {$maskedKey}");
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification for local testing
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60); // 60 second timeout
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30); // 30 second connection timeout
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // Enable SSL verification for security
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Authorization: Bearer ' . $this->secretKey,
             'Content-Type: application/json',
@@ -164,28 +218,46 @@ class Paystack {
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlError = curl_error($ch);
+        $curlErrno = curl_errno($ch);
         curl_close($ch);
         
         // Log the raw response
-        error_log("Paystack API Response - HTTP Code: {$httpCode}, Raw Response: {$response}");
+        error_log("Paystack API Response - HTTP Code: {$httpCode}, Response length: " . strlen($response));
         
-        if ($httpCode === 200) {
-            return json_decode($response, true);
+        // Handle cURL errors
+        if ($curlErrno) {
+            error_log("Paystack cURL Error #{$curlErrno}: {$curlError}");
+            return [
+                'status' => false,
+                'message' => 'Connection error: ' . $curlError,
+                'curl_error' => true
+            ];
+        }
+        
+        // Parse response
+        $decodedResponse = json_decode($response, true);
+        
+        if ($decodedResponse === null && json_last_error() !== JSON_ERROR_NONE) {
+            error_log("Paystack JSON decode error: " . json_last_error_msg() . " - Raw: " . substr($response, 0, 500));
+            return [
+                'status' => false,
+                'message' => 'Invalid response from payment gateway'
+            ];
+        }
+        
+        // Log success/failure
+        if ($httpCode >= 200 && $httpCode < 300) {
+            error_log("Paystack API Success - Status: " . ($decodedResponse['status'] ? 'true' : 'false'));
+            return $decodedResponse;
         }
         
         // Log API errors with more details
-        error_log("Paystack API Error - Endpoint: {$endpoint}, HTTP Code: {$httpCode}, Response: {$response}, cURL Error: {$curlError}");
+        error_log("Paystack API Error - HTTP {$httpCode}: " . json_encode($decodedResponse));
         
-        // Try to decode error response
-        if ($response) {
-            $errorData = json_decode($response, true);
-            if ($errorData) {
-                error_log("Paystack Error Details: " . json_encode($errorData));
-                return $errorData; // Return error details instead of null
-            }
-        }
-        
-        return null;
+        return $decodedResponse ?: [
+            'status' => false,
+            'message' => 'HTTP Error: ' . $httpCode
+        ];
     }
     
     /**
