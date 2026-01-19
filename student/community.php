@@ -12,7 +12,7 @@ $auth->requireRole('student');
 $user = $auth->getCurrentUser();
 
 // Slack workspace configuration
-$slackWorkspaceUrl = 'https://join.slack.com/t/harkonedesigns/shared_invite/zt-3nocuixh2-lpcCNxyA0acf6q6CN~UX4g'; // Replace with your Slack invite link
+$slackWorkspaceUrl = 'https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA'; // Replace with your Slack invite link
 $slackWorkspaceName = 'GrowthEngineAI Community';
 
 // Community channels
