@@ -15,8 +15,8 @@
  */
 
 // Google OAuth Credentials
-define('GOOGLE_CLIENT_ID', '');     // Your Google Client ID
-define('GOOGLE_CLIENT_SECRET', ''); // Your Google Client Secret
+define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID');     // Your Google Client ID
+define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET'); // Your Google Client Secret
 define('GOOGLE_REDIRECT_URI', SITE_URL . '/auth/google-callback');
 
 // Google OAuth URLs
