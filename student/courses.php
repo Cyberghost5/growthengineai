@@ -765,12 +765,12 @@ foreach ($categoriesRaw as $cat) {
                                             <?php if ($course['is_free']): ?>
                                                 <span class="price-free">FREE</span>
                                             <?php else: ?>
-                                                <span class="price-current">₦<?php echo number_format($course['price'], 1); ?></span>
+                                                <span class="price-current">₦<?php echo $course['price']; ?></span>
                                                 <?php if ($course['sale_price'] > 0 && $course['sale_price'] < $course['original_price']): ?>
-                                                    <span class="price-original">₦<?php echo number_format($course['original_price'], 1); ?></span>
+                                                    <span class="price-original">₦<?php echo $course['original_price']; ?></span>
                                                 <?php endif; ?>
                                             <?php endif; ?>
-                                            <span class="students-count"><i class="bi bi-people-fill"></i><?php echo number_format($course['students'], 1); ?> enrolled</span>
+                                            <span class="students-count"><i class="bi bi-people-fill"></i><?php echo $course['students']; ?> enrolled</span>
                                         </div>
                                         <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll">
                                             View Course
