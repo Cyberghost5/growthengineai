@@ -163,7 +163,7 @@ $user = $auth->getCurrentUser();
                         <a href="#" class="btn btn-outline-primary">
                             <i class="bi bi-person-plus me-1"></i> Add New User
                         </a>
-                        <a href="#" class="btn btn-outline-primary">
+                        <a href="courses.php" class="btn btn-outline-primary">
                             <i class="bi bi-book me-1"></i> Create Course
                         </a>
                         <a href="#" class="btn btn-outline-primary">
