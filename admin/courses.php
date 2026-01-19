@@ -560,6 +560,7 @@ $recentCourses = $db->query("
                                     <th>Instructor</th>
                                     <th>Status</th>
                                     <th>Price</th>
+                                    <th>Actions</th>
                                     <th>Created</th>
                                 </tr>
                             </thead>
@@ -577,6 +578,11 @@ $recentCourses = $db->query("
                                         </td>
                                         <td>
                                             <?php echo $course['is_free'] ? 'Free' : number_format((float)$course['price'], 2); ?>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-primary" href="course-content.php?course_id=<?php echo (int)$course['id']; ?>">
+                                                Manage Content
+                                            </a>
                                         </td>
                                         <td><?php echo htmlspecialchars($course['created_at']); ?></td>
                                     </tr>
