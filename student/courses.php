@@ -772,7 +772,7 @@ foreach ($categoriesRaw as $cat) {
                                             <?php endif; ?>
                                             <span class="students-count"><i class="bi bi-people-fill"></i><?php echo $course['students']; ?> enrolled</span>
                                         </div>
-                                        <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll">
+                                        <a href="<?php echo Url::course($course['slug'], $course['category_slug']); ?>" class="btn btn-enroll"> 
                                             View Course
                                         </a>
                                     </div>
