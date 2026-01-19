@@ -30,7 +30,7 @@ function webhookLog($message) {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     webhookLog("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode(['error' => 'Method not allowed'.$_SERVER['REQUEST_METHOD']]);
     exit;
 }
 
