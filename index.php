@@ -37,14 +37,16 @@ foreach ($coursesRaw as $course) {
         'id' => $course['id'],
         'slug' => $course['slug'],
         'title' => $course['title'],
-        'description' => $course['description'] ? substr(strip_tags($course['description']), 0, 150) . '...' : '',
+        'description' => $course['description'] ? substr(strip_tags($course['description']), 0, 120) . '...' : '',
         'category' => $course['category_name'],
+        'category_slug' => $course['category_slug'] ?? strtolower(str_replace(' ', '-', $course['category_name'] ?? 'general')),
         'icon' => $icon,
         'features' => $features,
         'level' => ucfirst($course['level']),
         'is_featured' => $course['is_featured'] ?? false,
+        'is_free' => $course['is_free'],
         'price' => $course['is_free'] ? 0 : ($course['sale_price'] > 0 ? $course['sale_price'] : $course['price']),
-        'is_free' => $course['is_free']
+        'thumbnail' => $course['thumbnail'] ?: 'images/portfolio-' . (($course['id'] % 9) + 1) . '.webp'
     ];
 }
 
@@ -301,42 +303,134 @@ foreach ($categoriesRaw as $cat) {
         </div>
 
         <div class="row gy-4">
-          <?php if (empty($courses)): ?>
-          <!-- Fallback if no courses in database -->
-          <div class="col-12 text-center">
-            <p class="text-muted">No courses available at the moment. Check back soon!</p>
-          </div>
-          <?php else: ?>
-          <?php $delay = 150; foreach ($courses as $course): ?>
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?= $delay ?>">
+          <!-- Static Service Cards -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
             <div class="service-item">
               <div class="service-header">
                 <div class="icon-wrapper">
-                  <i class="bi <?= htmlspecialchars($course['icon']) ?>"></i>
+                  <i class="bi bi-shield-lock"></i>
                 </div>
-                <?php if ($course['is_featured']): ?>
-                <span class="badge-popular">Featured</span>
-                <?php elseif ($course['is_free']): ?>
-                <span class="badge-popular">Free</span>
-                <?php endif; ?>
+                <span class="badge-popular">Popular</span>
               </div>
-              <h3><?= htmlspecialchars($course['title']) ?></h3>
-              <p><?= htmlspecialchars($course['description']) ?></p>
-              <?php if (!empty($course['features'])): ?>
+              <h3>Cybersecurity Training</h3>
+              <p>Master ethical hacking, penetration testing, and security operations. Prepare for industry certifications and protect organizations from cyber threats.</p>
               <ul class="feature-list">
-                <?php foreach ($course['features'] as $feature): ?>
-                <li><i class="bi bi-check-circle"></i> <?= htmlspecialchars($feature) ?></li>
-                <?php endforeach; ?>
+                <li><i class="bi bi-check-circle"></i> Ethical Hacking & Pen Testing</li>
+                <li><i class="bi bi-check-circle"></i> Network Security</li>
+                <li><i class="bi bi-check-circle"></i> SOC Analyst Training</li>
               </ul>
-              <?php endif; ?>
-              <a href="student/course/<?= htmlspecialchars($course['slug']) ?>" class="service-cta">
-                <span>View Course</span>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
                 <i class="bi bi-arrow-right"></i>
               </a>
             </div>
           </div>
-          <?php $delay += 50; endforeach; ?>
-          <?php endif; ?>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item">
+              <div class="service-header">
+                <div class="icon-wrapper">
+                  <i class="bi bi-gear-wide-connected"></i>
+                </div>
+              </div>
+              <h3>DevOps Engineering</h3>
+              <p>Learn containerization, CI/CD pipelines, and infrastructure automation. Deploy applications with confidence using modern DevOps practices.</p>
+              <ul class="feature-list">
+                <li><i class="bi bi-check-circle"></i> Docker & Kubernetes</li>
+                <li><i class="bi bi-check-circle"></i> CI/CD Pipelines</li>
+                <li><i class="bi bi-check-circle"></i> Infrastructure as Code</li>
+              </ul>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
+            <div class="service-item">
+              <div class="service-header">
+                <div class="icon-wrapper">
+                  <i class="bi bi-cloud"></i>
+                </div>
+                <span class="badge-popular">Best Seller</span>
+              </div>
+              <h3>Cloud Computing</h3>
+              <p>Build and manage cloud infrastructure on AWS, Azure, and GCP. Prepare for cloud certifications and architect scalable solutions.</p>
+              <ul class="feature-list">
+                <li><i class="bi bi-check-circle"></i> AWS Solutions Architect</li>
+                <li><i class="bi bi-check-circle"></i> Azure Fundamentals</li>
+                <li><i class="bi bi-check-circle"></i> Cloud Security</li>
+              </ul>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item">
+              <div class="service-header">
+                <div class="icon-wrapper">
+                  <i class="bi bi-code-slash"></i>
+                </div>
+              </div>
+              <h3>Software Development</h3>
+              <p>Build complete web and mobile applications. Learn modern frameworks and best practices for professional software development.</p>
+              <ul class="feature-list">
+                <li><i class="bi bi-check-circle"></i> Full-Stack Web Development</li>
+                <li><i class="bi bi-check-circle"></i> Python Programming</li>
+                <li><i class="bi bi-check-circle"></i> API Development</li>
+              </ul>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="350">
+            <div class="service-item">
+              <div class="service-header">
+                <div class="icon-wrapper">
+                  <i class="bi bi-bar-chart-line"></i>
+                </div>
+              </div>
+              <h3>Data Science & AI</h3>
+              <p>Unlock the power of data. Learn machine learning, data analysis, and AI implementation for real-world business problems.</p>
+              <ul class="feature-list">
+                <li><i class="bi bi-check-circle"></i> Machine Learning</li>
+                <li><i class="bi bi-check-circle"></i> Data Analysis</li>
+                <li><i class="bi bi-check-circle"></i> AI Implementation</li>
+              </ul>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="service-item">
+              <div class="service-header">
+                <div class="icon-wrapper">
+                  <i class="bi bi-hdd-network"></i>
+                </div>
+              </div>
+              <h3>System Administration</h3>
+              <p>Master Linux and Windows server administration. Learn to manage enterprise infrastructure and maintain system reliability.</p>
+              <ul class="feature-list">
+                <li><i class="bi bi-check-circle"></i> Linux Administration</li>
+                <li><i class="bi bi-check-circle"></i> Windows Server</li>
+                <li><i class="bi bi-check-circle"></i> Network Management</li>
+              </ul>
+              <a href="student/courses" class="service-cta">
+                <span>Explore Courses</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
 
         </div>
 
@@ -374,258 +468,55 @@ foreach ($categoriesRaw as $cat) {
         <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
           <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="200">
             <li data-filter="*" class="filter-active">All</li>
-            <li data-filter=".filter-web">Cybersecurity</li>
-            <li data-filter=".filter-mobile">DevOps</li>
-            <li data-filter=".filter-branding">Cloud</li>
-            <li data-filter=".filter-ui">Development</li>
+            <?php foreach ($categories as $cat): ?>
+            <li data-filter=".filter-<?= htmlspecialchars($cat['slug']) ?>"><?= htmlspecialchars($cat['name']) ?></li>
+            <?php endforeach; ?>
           </ul>
 
           <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="300">
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-web">
+            <?php if (empty($courses)): ?>
+            <div class="col-12 text-center">
+              <p class="text-muted">No courses available at the moment. Check back soon!</p>
+            </div>
+            <?php else: ?>
+            <?php foreach ($courses as $course): 
+              $filterClass = 'filter-' . ($course['category_slug'] ?? 'general');
+            ?>
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item <?= htmlspecialchars($filterClass) ?>">
               <div class="portfolio-card">
                 <div class="card-image">
-                  <img src="images/portfolio-1.webp" alt="Ethical Hacking Course" class="img-fluid" loading="lazy">
+                  <img src="<?= htmlspecialchars($course['thumbnail']) ?>" alt="<?= htmlspecialchars($course['title']) ?>" class="img-fluid" loading="lazy">
                   <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-1.webp" class="glightbox icon-btn">
+                    <a href="<?= htmlspecialchars($course['thumbnail']) ?>" class="glightbox icon-btn">
                       <i class="bi bi-arrows-fullscreen"></i>
                     </a>
                   </div>
+                  <?php if ($course['is_featured']): ?>
                   <div class="tag">Featured</div>
+                  <?php elseif ($course['is_free']): ?>
+                  <div class="tag">Free</div>
+                  <?php endif; ?>
                 </div>
                 <div class="card-content">
                   <div class="meta">
-                    <span class="category">Cybersecurity</span>
-                    <span class="year">Beginner to Advanced</span>
+                    <span class="category"><?= htmlspecialchars($course['category'] ?? 'General') ?></span>
+                    <span class="year"><?= htmlspecialchars($course['level']) ?></span>
                   </div>
-                  <h3>Ethical Hacking Masterclass</h3>
-                  <p>Learn penetration testing, vulnerability assessment, and ethical hacking techniques used by security professionals.</p>
+                  <h3><?= htmlspecialchars($course['title']) ?></h3>
+                  <p><?= htmlspecialchars($course['description']) ?></p>
+                  <?php if (!empty($course['features'])): ?>
                   <div class="tech-stack">
-                    <span>Kali Linux</span>
-                    <span>Metasploit</span>
-                    <span>Burp Suite</span>
+                    <?php foreach (array_slice($course['features'], 0, 3) as $feature): ?>
+                    <span><?= htmlspecialchars(strlen($feature) > 15 ? substr($feature, 0, 15) . '...' : $feature) ?></span>
+                    <?php endforeach; ?>
                   </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
+                  <?php endif; ?>
+                  <a href="student/course/<?= htmlspecialchars($course['slug']) ?>" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
                 </div>
               </div>
             </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-mobile">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-3.webp" alt="DevOps Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-3.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">DevOps</span>
-                    <span class="year">Intermediate</span>
-                  </div>
-                  <h3>Docker & Kubernetes Bootcamp</h3>
-                  <p>Master containerization and orchestration with hands-on labs and real-world deployment scenarios.</p>
-                  <div class="tech-stack">
-                    <span>Docker</span>
-                    <span>Kubernetes</span>
-                    <span>Helm</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-5.webp" alt="AWS Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-5.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                  <div class="tag">Best Seller</div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Cloud</span>
-                    <span class="year">All Levels</span>
-                  </div>
-                  <h3>AWS Solutions Architect</h3>
-                  <p>Prepare for AWS certification while learning to design highly available, cost-efficient cloud architectures.</p>
-                  <div class="tech-stack">
-                    <span>EC2</span>
-                    <span>S3</span>
-                    <span>Lambda</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-ui">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-7.webp" alt="Full Stack Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-7.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Development</span>
-                    <span class="year">Beginner</span>
-                  </div>
-                  <h3>Full-Stack Web Development</h3>
-                  <p>Build complete web applications from scratch using modern JavaScript frameworks and backend technologies.</p>
-                  <div class="tech-stack">
-                    <span>React</span>
-                    <span>Node.js</span>
-                    <span>MongoDB</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-web">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-2.webp" alt="Network Security Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-2.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Cybersecurity</span>
-                    <span class="year">Intermediate</span>
-                  </div>
-                  <h3>Network Security Fundamentals</h3>
-                  <p>Learn to secure networks, configure firewalls, and detect intrusions in enterprise environments.</p>
-                  <div class="tech-stack">
-                    <span>Wireshark</span>
-                    <span>pfSense</span>
-                    <span>Snort</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-mobile">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-4.webp" alt="CI/CD Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-4.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                  <div class="tag">Featured</div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">DevOps</span>
-                    <span class="year">Advanced</span>
-                  </div>
-                  <h3>CI/CD Pipeline Mastery</h3>
-                  <p>Automate software delivery with Jenkins, GitHub Actions, and GitLab CI. Deploy with confidence.</p>
-                  <div class="tech-stack">
-                    <span>Jenkins</span>
-                    <span>GitHub Actions</span>
-                    <span>Terraform</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-ui">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-8.webp" alt="Python Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-8.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Development</span>
-                    <span class="year">Beginner</span>
-                  </div>
-                  <h3>Python Programming Complete</h3>
-                  <p>From basics to advanced concepts. Learn Python for automation, data science, and web development.</p>
-                  <div class="tech-stack">
-                    <span>Python</span>
-                    <span>Django</span>
-                    <span>Flask</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-6.webp" alt="Azure Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-6.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Cloud</span>
-                    <span class="year">Intermediate</span>
-                  </div>
-                  <h3>Microsoft Azure Fundamentals</h3>
-                  <p>Get started with Microsoft Azure cloud services. Perfect preparation for AZ-900 certification.</p>
-                  <div class="tech-stack">
-                    <span>Azure</span>
-                    <span>Virtual Machines</span>
-                    <span>Azure AD</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-web">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="images/portfolio-9.webp" alt="SOC Analyst Course" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="assets/img/portfolio/portfolio-9.webp" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category">Cybersecurity</span>
-                    <span class="year">Advanced</span>
-                  </div>
-                  <h3>SOC Analyst Training</h3>
-                  <p>Become a Security Operations Center analyst. Learn threat detection, incident response, and SIEM tools.</p>
-                  <div class="tech-stack">
-                    <span>SIEM</span>
-                    <span>Threat Intel</span>
-                    <span>IR</span>
-                  </div>
-                  <a href="#contact" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
           </div>
 
         </div>
