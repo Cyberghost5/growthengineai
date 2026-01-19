@@ -116,12 +116,24 @@ class Paystack {
         
         error_log("Transaction found in DB - ID: {$existingTransaction['id']}, Status: {$existingTransaction['status']}");
         
-        // If already completed, return success without re-verifying
+        // If already completed, return success with cached data
+        // Note: Caller should still check enrollment status!
         if ($existingTransaction['status'] === 'completed') {
             error_log("Transaction already completed, returning cached result");
+            
+            // Parse saved response, fallback to constructing from transaction data
+            $savedResponse = json_decode($existingTransaction['paystack_response'] ?? '{}', true);
+            if (empty($savedResponse)) {
+                $savedResponse = [
+                    'amount' => $existingTransaction['amount'] * 100, // Convert back to kobo
+                    'currency' => $existingTransaction['currency'],
+                    'status' => 'success'
+                ];
+            }
+            
             return [
                 'success' => true,
-                'data' => json_decode($existingTransaction['paystack_response'] ?? '{}', true),
+                'data' => $savedResponse,
                 'transaction' => $existingTransaction,
                 'cached' => true
             ];

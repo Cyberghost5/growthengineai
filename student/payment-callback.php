@@ -85,9 +85,17 @@ error_log("Payment verification result: " . json_encode($verification));
 
 if ($verification['success']) {
     $transaction = $verification['data'] ?? [];
-    $amount = isset($transaction['amount']) ? $transaction['amount'] / 100 : 0; // Convert from kobo to naira
     
-    error_log("Payment verified successfully - Amount: {$amount}");
+    // Get amount - try from Paystack response first, fallback to database transaction
+    $amount = 0;
+    if (isset($transaction['amount'])) {
+        $amount = $transaction['amount'] / 100; // Convert from kobo to naira
+    } elseif (isset($existingTransaction['amount'])) {
+        $amount = (float)$existingTransaction['amount'];
+        error_log("Using amount from DB transaction: {$amount}");
+    }
+    
+    error_log("Payment verified successfully - Amount: {$amount}, Cached: " . (isset($verification['cached']) ? 'YES' : 'NO'));
     
     // Check if already enrolled (avoid duplicate enrollment)
     $alreadyEnrolled = $courseModel->isEnrolled($userId, $courseId);
