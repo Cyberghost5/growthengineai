@@ -66,7 +66,7 @@ if (!empty($token)) {
                 </div>
 
                 <div class="auth-footer mt-4">
-                    <a href="../index.html"><i class="bi bi-arrow-left"></i> Back to Home</a>
+                    <a href="../../"><i class="bi bi-arrow-left"></i> Back to Home</a>
                 </div>
             </div>
         </div>

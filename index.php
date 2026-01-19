@@ -95,7 +95,7 @@ foreach ($categoriesRaw as $cat) {
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <a href="../" class="logo d-flex align-items-center me-auto me-xl-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <img src="images/logo_ge.png" alt="">
         <!-- <h1 class="sitename">GrowthEngineAI</h1> -->
@@ -1087,7 +1087,7 @@ foreach ($categoriesRaw as $cat) {
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-5 col-md-12 footer-about">
-          <a href="index.html" class="logo d-flex align-items-center">
+          <a href="../" class="logo d-flex align-items-center">
             <img src="images/logo_ge.png" alt="" style="max-height: 60px;">
             <!-- <span class="sitename">GrowthEngineAI</span> -->
           </a>

@@ -89,7 +89,7 @@ if (isset($_GET['error'])) {
         <div class="auth-wrapper">
             <div class="auth-left">
                 <div class="auth-left-content">
-                    <a href="../index.html" class="auth-logo">
+                    <a href="../../" class="auth-logo">
                         <img src="../images/logo-dark.png" alt="" width="250px">
                         <!-- <span>GrowthEngineAI</span> -->
                     </a>
@@ -207,7 +207,7 @@ if (isset($_GET['error'])) {
                     </div>
 
                     <div class="auth-footer">
-                        <a href="../index.html"><i class="bi bi-arrow-left"></i> Back to Home</a>
+                        <a href="../../"><i class="bi bi-arrow-left"></i> Back to Home</a>
                     </div>
                 </div>
             </div>

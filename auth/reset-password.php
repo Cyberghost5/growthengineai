@@ -9,7 +9,7 @@ $auth = new Auth();
 
 // Redirect if already logged in
 if ($auth->isLoggedIn()) {
-    header('Location: ../index.html');
+    header('Location: ../../');
     exit;
 }
 
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="auth-wrapper">
             <div class="auth-left">
                 <div class="auth-left-content">
-                    <a href="../index.html" class="auth-logo">
+                    <a href="../../" class="auth-logo">
                         <img src="../images/logo-dark.png" alt="" width="250px">
                         <!-- <span>GrowthEngineAI</span> -->
                     </a>
