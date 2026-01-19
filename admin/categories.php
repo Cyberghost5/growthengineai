@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/database.php';
 // Simple authentication check (replace with your admin auth logic)
 session_start();
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ../auth/login.php');
+    header('Location: ../auth/login');
     exit;
 }
 
