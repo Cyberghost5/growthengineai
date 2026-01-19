@@ -41,7 +41,7 @@ class Paystack {
         
         // Get currency and callback URL from settings
         $currency = $this->settings->get('paystack_currency', 'NGN');
-        $callbackUrl = SITE_URL . '/student/payment-callback.php';
+        $callbackUrl = SITE_URL . '/student/payment-callback.php?course_id=' . $courseId;
         
         // Prepare payment data
         $data = [
@@ -230,8 +230,20 @@ class Paystack {
             $params[] = $reference;
             
             $sql = "UPDATE transactions SET " . implode(', ', $updates) . " WHERE reference = ?";
+            
+            error_log("Updating transaction - SQL: {$sql}, Params: " . json_encode($params));
+            
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute($params);
+            $result = $stmt->execute($params);
+            $rowCount = $stmt->rowCount();
+            
+            error_log("Transaction update result - Success: " . ($result ? 'true' : 'false') . ", Rows affected: {$rowCount}");
+            
+            if ($rowCount === 0) {
+                error_log("WARNING: No rows updated for reference: {$reference}");
+            }
+            
+            return $result;
         } catch (PDOException $e) {
             error_log("Transaction update failed: " . $e->getMessage());
             return false;

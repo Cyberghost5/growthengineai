@@ -352,21 +352,35 @@ class Course {
      * Enroll a user in a course
      */
     public function enrollUser($userId, $courseId, $pricePaid = 0) {
-        // Check if already enrolled
-        if ($this->isEnrolled($userId, $courseId)) {
-            return ['success' => false, 'message' => 'Already enrolled'];
+        try {
+            // Check if already enrolled
+            if ($this->isEnrolled($userId, $courseId)) {
+                return ['success' => true, 'message' => 'Already enrolled'];
+            }
+            
+            $sql = "INSERT INTO enrollments (user_id, course_id, amount_paid, enrolled_at) 
+                    VALUES (?, ?, ?, NOW())";
+            
+            $stmt = $this->db->prepare($sql);
+            $result = $stmt->execute([$userId, $courseId, $pricePaid]);
+            
+            if (!$result) {
+                error_log("Enrollment SQL failed: " . json_encode($stmt->errorInfo()));
+                return ['success' => false, 'message' => 'Failed to create enrollment record'];
+            }
+            
+            $enrollmentId = $this->db->lastInsertId();
+            
+            // Update course enrollment count
+            $this->db->query("UPDATE courses SET total_enrollments = total_enrollments + 1 WHERE id = " . (int)$courseId);
+            
+            error_log("Enrollment successful - ID: {$enrollmentId}, User: {$userId}, Course: {$courseId}");
+            
+            return ['success' => true, 'enrollment_id' => $enrollmentId];
+        } catch (PDOException $e) {
+            error_log("Enrollment error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
-        
-        $sql = "INSERT INTO enrollments (user_id, course_id, amount_paid, enrolled_at) 
-                VALUES (?, ?, ?, NOW())";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$userId, $courseId, $pricePaid]);
-        
-        // Update course enrollment count
-        $this->db->query("UPDATE courses SET total_enrollments = total_enrollments + 1 WHERE id = " . (int)$courseId);
-        
-        return ['success' => true, 'enrollment_id' => $this->db->lastInsertId()];
     }
     
     /**

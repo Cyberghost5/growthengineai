@@ -271,6 +271,15 @@ $stats = $paystack->getUserTransactionStats($user['id']);
         .empty-state p {
             color: #94a3b8;
         }
+        .verify-btn {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .verify-btn:disabled {
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -388,7 +397,7 @@ $stats = $paystack->getUserTransactionStats($user['id']);
                         </div>
                         <?php else: ?>
                         <?php foreach ($transactions as $transaction): ?>
-                        <div class="transaction-item">
+                        <div class="transaction-item" id="transaction-<?php echo htmlspecialchars($transaction['reference']); ?>">
                             <img src="<?php echo htmlspecialchars($transaction['course_image'] ?: 'https://via.placeholder.com/80x60'); ?>" 
                                  alt="<?php echo htmlspecialchars($transaction['course_title']); ?>" 
                                  class="transaction-image">
@@ -403,18 +412,27 @@ $stats = $paystack->getUserTransactionStats($user['id']);
                             <div class="transaction-amount">
                                 <?php echo $transaction['currency']; ?> <?php echo number_format($transaction['amount'], 2); ?>
                             </div>
-                            <span class="transaction-status status-<?php echo strtolower($transaction['status']); ?>">
-                                <?php 
-                                $statusIcons = [
-                                    'completed' => 'check-circle',
-                                    'pending' => 'clock',
-                                    'failed' => 'x-circle',
-                                    'cancelled' => 'x-circle'
-                                ];
-                                ?>
-                                <i class="bi bi-<?php echo $statusIcons[$transaction['status']]; ?> me-1"></i>
-                                <?php echo ucfirst($transaction['status']); ?>
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="transaction-status status-<?php echo strtolower($transaction['status']); ?>">
+                                    <?php 
+                                    $statusIcons = [
+                                        'completed' => 'check-circle',
+                                        'pending' => 'clock',
+                                        'failed' => 'x-circle',
+                                        'cancelled' => 'x-circle'
+                                    ];
+                                    ?>
+                                    <i class="bi bi-<?php echo $statusIcons[$transaction['status']]; ?> me-1"></i>
+                                    <?php echo ucfirst($transaction['status']); ?>
+                                </span>
+                                <?php if ($transaction['status'] === 'pending'): ?>
+                                <button class="btn btn-sm btn-outline-primary verify-btn" 
+                                        data-reference="<?php echo htmlspecialchars($transaction['reference']); ?>"
+                                        onclick="verifyTransaction('<?php echo htmlspecialchars($transaction['reference']); ?>')">
+                                    <i class="bi bi-arrow-repeat"></i> Verify
+                                </button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                         <?php endforeach; ?>
                         <?php endif; ?>
@@ -432,21 +450,88 @@ $stats = $paystack->getUserTransactionStats($user['id']);
             document.body.style.overflow = document.getElementById('sidebar').classList.contains('active') ? 'hidden' : '';
         }
 
-        // Show success/error messages
+        // Verify pending transaction
+        async function verifyTransaction(reference) {
+            const btn = document.querySelector(`button[data-reference="${reference}"]`);
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Verifying...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('reference', reference);
+                
+                const response = await fetch('verify-transaction.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    
+                    // Update the status badge
+                    const transactionRow = document.getElementById('transaction-' + reference);
+                    if (transactionRow) {
+                        const statusBadge = transactionRow.querySelector('.transaction-status');
+                        statusBadge.className = 'transaction-status status-completed';
+                        statusBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Completed';
+                        
+                        // Remove verify button
+                        btn.remove();
+                    }
+                    
+                    // Redirect to course if enrolled
+                    if (result.redirect) {
+                        setTimeout(() => {
+                            window.location.href = result.redirect;
+                        }, 2000);
+                    } else {
+                        // Reload to update stats
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                } else {
+                    showAlert(result.message, 'danger');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (error) {
+                showAlert('An error occurred while verifying the transaction', 'danger');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+        
+        function showAlert(message, type) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(el => el.remove());
+            
+            document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(el => el.remove());
+            }, 5000);
+        }
+
+        // Show success/error messages from URL
         const urlParams = new URLSearchParams(window.location.search);
         const payment = urlParams.get('payment');
         const message = urlParams.get('message');
 
         if (payment && message) {
-            const alertClass = payment === 'success' ? 'alert-success' : 'alert-danger';
-            const alertHtml = `
-                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    ${decodeURIComponent(message)}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
-            
+            showAlert(decodeURIComponent(message), payment === 'success' ? 'success' : 'danger');
             // Remove query params
             window.history.replaceState({}, document.title, window.location.pathname);
         }

@@ -16,11 +16,27 @@ $paystack = new Paystack();
 $courseModel = new Course();
 
 // Get payment reference and course ID from URL
-$reference = isset($_GET['reference']) ? trim($_GET['reference']) : ''; 
+// Paystack can send either 'reference' or 'trxref' as the parameter
+$reference = isset($_GET['reference']) ? trim($_GET['reference']) : '';
+if (empty($reference) && isset($_GET['trxref'])) {
+    $reference = trim($_GET['trxref']);
+}
 $courseId = isset($_GET['course_id']) ? (int)$_GET['course_id'] : 0;
 
+// Log all GET parameters for debugging
+error_log("Payment callback - All GET params: " . json_encode($_GET));
+
+// If course_id is not in URL, try to get it from the transaction record
+if (!$courseId && !empty($reference)) {
+    $existingTransaction = $paystack->getTransactionByReference($reference);
+    if ($existingTransaction) {
+        $courseId = (int)$existingTransaction['course_id'];
+        error_log("Course ID retrieved from transaction record: {$courseId}");
+    }
+}
+
 // Log the callback request for debugging
-erro_log("Payment callback initiated - Reference: {$reference}, Course ID: {$courseId}, User ID: {$user['id']}");
+error_log("Payment callback initiated - Reference: {$reference}, Course ID: {$courseId}, User ID: {$user['id']}");
 
 if (empty($reference) || !$courseId) {
     error_log("Payment callback failed - Invalid parameters");
