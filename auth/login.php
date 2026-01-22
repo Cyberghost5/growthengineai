@@ -100,10 +100,10 @@ if (isset($_GET['error'])) {
                             <i class="bi bi-book"></i>
                             <span>Access Premium Courses</span>
                         </div>
-                        <div class="auth-feature">
+                        <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" target="_blank" rel="noopener noreferrer" class="auth-feature">
                             <i class="bi bi-slack"></i>
                             <span>Join Slack Community</span>
-                        </div>
+                        </a>
                         <div class="auth-feature">
                             <i class="bi bi-graph-up"></i>
                             <span>Track Your Progress</span>
