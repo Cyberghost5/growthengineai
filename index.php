@@ -150,7 +150,7 @@ foreach ($categoriesRaw as $cat) {
             <div class="hero-visual">
               <div class="product-mockup">
                 <div class="mockup-frame">
-                  <img src="images/ge-dark.png" alt="Product Dashboard" class="img-fluid">
+                  <img src="images/ge-new.png" alt="Product Dashboard" class="img-fluid">
                 </div>
                 <div class="floating-card card-1" data-aos="fade-up" data-aos-delay="400">
                   <div class="card-icon">
