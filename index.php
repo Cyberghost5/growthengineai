@@ -279,6 +279,90 @@ foreach ($categoriesRaw as $cat) {
 
     </section><!-- /About Section -->
 
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Learning Paths</h2>
+        <div><span>Explore Our</span> <span class="description-title">Learning Paths</span></div>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+          <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="200">
+            <li data-filter="*" class="filter-active">All</li>
+            <?php foreach ($categories as $cat): ?>
+            <li data-filter=".filter-<?= htmlspecialchars($cat['slug']) ?>"><?= htmlspecialchars($cat['name']) ?></li>
+            <?php endforeach; ?>
+          </ul>
+
+          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="300">
+            <?php if (empty($courses)): ?>
+            <div class="col-12 text-center">
+              <p class="text-muted">No courses available at the moment. Check back soon!</p>
+            </div>
+            <?php else: ?>
+            <?php foreach ($courses as $course): 
+              $filterClass = 'filter-' . ($course['category_slug'] ?? 'general');
+            ?>
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item <?= htmlspecialchars($filterClass) ?>">
+              <div class="portfolio-card">
+                <div class="card-image">
+                  <img src="<?= htmlspecialchars($course['thumbnail']) ?>" alt="<?= htmlspecialchars($course['title']) ?>" class="img-fluid" loading="lazy">
+                  <div class="overlay">
+                    <a href="<?= htmlspecialchars($course['thumbnail']) ?>" class="glightbox icon-btn">
+                      <i class="bi bi-arrows-fullscreen"></i>
+                    </a>
+                  </div>
+                  <?php if ($course['is_featured']): ?>
+                  <div class="tag">Featured</div>
+                  <?php elseif ($course['is_free']): ?>
+                  <div class="tag">Free</div>
+                  <?php endif; ?>
+                </div>
+                <div class="card-content">
+                  <div class="meta">
+                    <span class="category"><?= htmlspecialchars($course['category'] ?? 'General') ?></span>
+                    <span class="year"><?= htmlspecialchars($course['level']) ?></span>
+                  </div>
+                  <h3><?= htmlspecialchars($course['title']) ?></h3>
+                  <p><?= htmlspecialchars($course['description']) ?></p>
+                  <?php if (!empty($course['features'])): ?>
+                  <div class="tech-stack">
+                    <?php foreach (array_slice($course['features'], 0, 3) as $feature): ?>
+                    <span><?= htmlspecialchars(strlen($feature) > 15 ? substr($feature, 0, 15) . '...' : $feature) ?></span>
+                    <?php endforeach; ?>
+                  </div>
+                  <?php endif; ?>
+                  <a href="student/course/<?= htmlspecialchars($course['slug']) ?>" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
+
+        </div>
+
+        <div class="cta-box" data-aos="fade-up" data-aos-delay="400">
+          <div class="row align-items-center">
+            <div class="col-lg-8">
+              <h3>Ready to start your learning journey?</h3>
+              <p>Join GrowthEngineAI and gain the skills you need to succeed in the tech industry. Our expert-led courses and supportive community are here to help you grow.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+              <a href="#contact" class="btn-primary">Get Started</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Portfolio Section -->
+
     <!-- Services Section -->
     <section id="services" class="services section">
 
@@ -457,89 +541,6 @@ foreach ($categoriesRaw as $cat) {
       </div>
 
     </section><!-- /Services Section -->
-
-    <!-- Portfolio Section -->
-    <section id="portfolio" class="portfolio section">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Learning Paths</h2>
-        <div><span>Explore Our</span> <span class="description-title">Learning Paths</span></div>
-      </div><!-- End Section Title -->
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-          <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="200">
-            <li data-filter="*" class="filter-active">All</li>
-            <?php foreach ($categories as $cat): ?>
-            <li data-filter=".filter-<?= htmlspecialchars($cat['slug']) ?>"><?= htmlspecialchars($cat['name']) ?></li>
-            <?php endforeach; ?>
-          </ul>
-
-          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="300">
-            <?php if (empty($courses)): ?>
-            <div class="col-12 text-center">
-              <p class="text-muted">No courses available at the moment. Check back soon!</p>
-            </div>
-            <?php else: ?>
-            <?php foreach ($courses as $course): 
-              $filterClass = 'filter-' . ($course['category_slug'] ?? 'general');
-            ?>
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item <?= htmlspecialchars($filterClass) ?>">
-              <div class="portfolio-card">
-                <div class="card-image">
-                  <img src="<?= htmlspecialchars($course['thumbnail']) ?>" alt="<?= htmlspecialchars($course['title']) ?>" class="img-fluid" loading="lazy">
-                  <div class="overlay">
-                    <a href="<?= htmlspecialchars($course['thumbnail']) ?>" class="glightbox icon-btn">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                    </a>
-                  </div>
-                  <?php if ($course['is_featured']): ?>
-                  <div class="tag">Featured</div>
-                  <?php elseif ($course['is_free']): ?>
-                  <div class="tag">Free</div>
-                  <?php endif; ?>
-                </div>
-                <div class="card-content">
-                  <div class="meta">
-                    <span class="category"><?= htmlspecialchars($course['category'] ?? 'General') ?></span>
-                    <span class="year"><?= htmlspecialchars($course['level']) ?></span>
-                  </div>
-                  <h3><?= htmlspecialchars($course['title']) ?></h3>
-                  <p><?= htmlspecialchars($course['description']) ?></p>
-                  <?php if (!empty($course['features'])): ?>
-                  <div class="tech-stack">
-                    <?php foreach (array_slice($course['features'], 0, 3) as $feature): ?>
-                    <span><?= htmlspecialchars(strlen($feature) > 15 ? substr($feature, 0, 15) . '...' : $feature) ?></span>
-                    <?php endforeach; ?>
-                  </div>
-                  <?php endif; ?>
-                  <a href="student/course/<?= htmlspecialchars($course['slug']) ?>" class="view-project">Enroll Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-            <?php endforeach; ?>
-            <?php endif; ?>
-          </div>
-
-        </div>
-
-        <div class="cta-box" data-aos="fade-up" data-aos-delay="400">
-          <div class="row align-items-center">
-            <div class="col-lg-8">
-              <h3>Ready to start your learning journey?</h3>
-              <p>Join GrowthEngineAI and gain the skills you need to succeed in the tech industry. Our expert-led courses and supportive community are here to help you grow.</p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-              <a href="#contact" class="btn-primary">Get Started</a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </section><!-- /Portfolio Section -->
 
     <!-- Why Us Section -->
     <section id="why-us" class="why-us section light-background">
