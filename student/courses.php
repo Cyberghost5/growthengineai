@@ -756,7 +756,7 @@ foreach ($categoriesRaw as $cat) {
                                     </div>
                                     <p class="course-description"><?php echo $course['description']; ?></p>
                                     <div class="course-meta">
-                                        <span><i class="bi bi-clock"></i><?php echo htmlspecialchars($course['duration']); ?></span>
+                                        <!-- <span><i class="bi bi-clock"></i><?php echo htmlspecialchars($course['duration']); ?></span> -->
                                         <span><i class="bi bi-collection-play"></i><?php echo $course['lessons']; ?> lessons</span>
                                         <span class="course-rating"><i class="bi bi-star-fill"></i><?php echo number_format($course['rating'], 1); ?></span>
                                     </div>

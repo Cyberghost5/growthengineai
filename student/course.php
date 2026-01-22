@@ -716,12 +716,12 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                         <h6 class="mb-3">This course includes:</h6>
                         <div class="course-feature">
                             <i class="bi bi-play-circle"></i>
-                            <span><?php echo $course['lessons']; ?> video lessons</span>
+                            <span><?php echo $course['lessons']; ?> live lessons</span>
                         </div>
-                        <div class="course-feature">
+                        <!-- <div class="course-feature">
                             <i class="bi bi-clock"></i>
                             <span><?php echo $course['duration']; ?> of content</span>
-                        </div>
+                        </div> -->
                         <div class="course-feature">
                             <i class="bi bi-file-earmark-text"></i>
                             <span>Downloadable resources</span>
