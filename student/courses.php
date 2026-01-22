@@ -754,7 +754,7 @@ foreach ($categoriesRaw as $cat) {
                                         <i class="bi bi-person-circle"></i>
                                         <span><?php echo htmlspecialchars($course['instructor']); ?></span>
                                     </div>
-                                    <p><?php echo $course['description']; ?></p>
+                                    <p class="course-description"><?php echo htmlspecialchars(strip_tags($course['description'])); ?></p>
                                     <div class="course-meta">
                                         <!-- <span><i class="bi bi-clock"></i><?php echo htmlspecialchars($course['duration']); ?></span> -->
                                         <span><i class="bi bi-collection-play"></i><?php echo $course['lessons']; ?> lessons</span>
