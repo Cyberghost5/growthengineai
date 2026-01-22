@@ -248,7 +248,7 @@ foreach ($categoriesRaw as $cat) {
 
               <div class="cta-group">
                 <a href="#services" class="btn btn-primary">Explore Courses <i class="bi bi-arrow-right"></i></a>
-                <a href="#contact" class="btn btn-secondary">Join Community</a>
+                <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" class="btn btn-secondary">Join Community</a>
               </div>
             </div>
           </div>
@@ -591,7 +591,7 @@ foreach ($categoriesRaw as $cat) {
               </div>
               <h4>Exclusive Slack Community</h4>
               <p>Connect with instructors and peers in real-time. Get your questions answered, collaborate on projects, and build your professional network.</p>
-              <a href="#contact" class="learn-more">Join Community <i class="bi bi-arrow-right"></i></a>
+              <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" class="learn-more">Join Community <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
 
