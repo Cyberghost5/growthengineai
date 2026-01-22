@@ -128,10 +128,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-lightning"></i>
                             <span>Instant Access</span>
                         </div>
-                        <div class="auth-feature">
-                            <i class="bi bi-people"></i>
-                            <span>Community Support</span>
-                        </div>
+                        <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" class="auth-feature">
+                            <i class="bi bi-slack"></i>
+                            <span>Join Slack Community</span>
+                        </a>
                     </div>
                 </div>
             </div>
