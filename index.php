@@ -354,7 +354,7 @@ foreach ($categoriesRaw as $cat) {
               <p>Join GrowthEngineAI and gain the skills you need to succeed in the tech industry. Our expert-led courses and supportive community are here to help you grow.</p>
             </div>
             <div class="col-lg-4 text-lg-end">
-              <a href="#contact" class="btn-primary">Get Started</a>
+              <a href="auth/login" class="btn-primary">Get Started</a>
             </div>
           </div>
         </div>
@@ -532,8 +532,8 @@ foreach ($categoriesRaw as $cat) {
               </div>
             </div>
             <div class="col-lg-4 text-lg-end">
-              <a href="#contact" class="btn-primary">Get Started <i class="bi bi-arrow-right"></i></a>
-              <a href="#contact" class="btn-secondary">Join Community</a>
+              <a href="auth/login" class="btn-primary">Get Started <i class="bi bi-arrow-right"></i></a>
+              <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" target="_blank" class="btn-secondary">Join Community</a>
             </div>
           </div>
         </div>
