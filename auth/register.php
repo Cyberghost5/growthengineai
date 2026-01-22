@@ -230,14 +230,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <span class="role-desc">Learn new skills</span>
                                     </div>
                                 </label>
-                                <label class="role-option <?php echo $formData['role'] === 'tutor' ? 'selected' : ''; ?>">
+                                <!-- <label class="role-option <?php echo $formData['role'] === 'tutor' ? 'selected' : ''; ?>">
                                     <input type="radio" name="role" value="tutor" <?php echo $formData['role'] === 'tutor' ? 'checked' : ''; ?>>
                                     <div class="role-content">
                                         <i class="bi bi-person-video3"></i>
                                         <span class="role-title">Tutor</span>
                                         <span class="role-desc">Teach & earn</span>
                                     </div>
-                                </label>
+                                </label> -->
                             </div>
                             <?php if (isset($errors['role'])): ?>
                                 <div class="invalid-feedback d-block"><?php echo htmlspecialchars($errors['role']); ?></div>
