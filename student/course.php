@@ -572,7 +572,7 @@ $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100)
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="section-title"><i class="bi bi-file-text me-2"></i>Description</h5>
-                                <p class="text-muted"><?php echo $course['long_description']; ?></p>
+                                <p><?php echo $course['long_description']; ?></p>
                             </div>
                         </div>
 
