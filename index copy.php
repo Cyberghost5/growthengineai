@@ -696,6 +696,162 @@ foreach ($categoriesRaw as $cat) {
 
     </section><!-- /Why Us Section -->
 
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials section light-background">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Testimonials</h2>
+        <div><span>What Our</span> <span class="description-title">Students Say</span></div>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="testimonials-slider swiper init-swiper">
+          <script type="application/json" class="swiper-config">
+            {
+              "slidesPerView": 1,
+              "loop": true,
+              "speed": 600,
+              "autoplay": {
+                "delay": 5000
+              },
+              "navigation": {
+                "nextEl": ".swiper-button-next",
+                "prevEl": ".swiper-button-prev"
+              }
+            }
+          </script>
+
+          <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h2>The Cybersecurity course changed my career</h2>
+                    <p>
+                      I was stuck in a dead-end IT support job until I found GrowthEngineAI. The Ethical Hacking course was incredibly comprehensive and hands-on. The Slack community was invaluable - I got help whenever I was stuck.
+                    </p>
+                    <p>
+                      Within 3 months of completing the course, I landed a junior penetration tester role. The practical skills I learned here made all the difference in my interviews. Highly recommended for anyone serious about tech!
+                    </p>
+                    <div class="profile d-flex align-items-center">
+                      <img src="images/person-m-7.webp" class="profile-img" alt="">
+                      <div class="profile-info">
+                        <h3>Emmanuel Okonkwo</h3>
+                        <span>Cybersecurity Student</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 d-none d-lg-block">
+                    <div class="featured-img-wrapper">
+                      <img src="images/person-m-7.webp" class="featured-img" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Testimonial Item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h2>Best DevOps training I've ever taken</h2>
+                    <p>
+                      As someone transitioning from traditional development to DevOps, I needed structured, practical training. GrowthEngineAI's Docker & Kubernetes course was exactly what I needed. The instructors explain complex concepts clearly.
+                    </p>
+                    <p>
+                      What really sets this platform apart is the Slack community. I've made connections with professionals from around the world and even collaborated on open-source projects. This isn't just a course platform, it's a career launchpad.
+                    </p>
+                    <div class="profile d-flex align-items-center">
+                      <img src="images/person-f-8.webp" class="profile-img" alt="">
+                      <div class="profile-info">
+                        <h3>Fatima Ibrahim</h3>
+                        <span>DevOps Student</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 d-none d-lg-block">
+                    <div class="featured-img-wrapper">
+                      <img src="images/person-f-8.webp" class="featured-img" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Testimonial Item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h2>
+                      Finally mastered cloud computing!
+                    </h2>
+                    <p>
+                      I tried learning AWS on my own for months but kept getting overwhelmed. The AWS Solutions Architect course here broke everything down into manageable pieces. The hands-on labs were game-changers.
+                    </p>
+                    <p>
+                      The Slack community helped me prepare for my certification exam. Other students shared their experiences and tips. I passed on my first attempt! Now working remotely as a cloud engineer. Thank you GrowthEngineAI!
+                    </p>
+                    <div class="profile d-flex align-items-center">
+                      <img src="images/person-m-9.webp" class="profile-img" alt="">
+                      <div class="profile-info">
+                        <h3>Chidi Amaechi</h3>
+                        <span>Cloud Computing Student</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 d-none d-lg-block">
+                    <div class="featured-img-wrapper">
+                      <img src="images/person-m-9.webp" class="featured-img" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Testimonial Item -->
+
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <h2>From zero coding to full-stack developer</h2>
+                    <p>
+                      I had no programming background when I started the Full-Stack Web Development course. The curriculum was well-structured and the instructors were patient. The projects gave me real confidence.
+                    </p>
+                    <p>
+                      The best part? The Slack community is so supportive. Whenever I got stuck on a bug, someone was always there to help. I've now built three complete web applications and I'm freelancing on the side. GrowthEngineAI changed my life!
+                    </p>
+                    <div class="profile d-flex align-items-center">
+                      <img src="images/person-f-10.webp" class="profile-img" alt="">
+                      <div class="profile-info">
+                        <h3>Aisha Mohammed</h3>
+                        <span>Web Development Student</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 d-none d-lg-block">
+                    <div class="featured-img-wrapper">
+                      <img src="images/person-f-10.webp" class="featured-img" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Testimonial Item -->
+
+          </div>
+
+          <div class="swiper-navigation w-100 d-flex align-items-center justify-content-center">
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Testimonials Section -->
+
     <!-- Contact Section -->
     <section id="contact" class="contact section">
 
@@ -748,7 +904,7 @@ foreach ($categoriesRaw as $cat) {
                 </div>
                 <div class="channel-info">
                   <h5>Location</h5>
-                  <p>Lokoja, Nigeria</p>
+                  <p>Bauchi, Nigeria</p>
                   <span class="channel-meta">Serving students worldwide</span>
                 </div>
               </div>
@@ -864,7 +1020,7 @@ foreach ($categoriesRaw as $cat) {
 
         <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
           <h4>Contact Us</h4>
-          <p>Lokoja</p>
+          <p>Bauchi</p>
           <p>Nigeria</p>
           <p class="mt-4"><strong>Phone:</strong> <span>+234 802 222 4350</span></p>
           <p><strong>Email:</strong> <span>info@growthengineai.org</span></p>
