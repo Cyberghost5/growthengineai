@@ -310,7 +310,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-shield-lock"></i>
                 </div>
-                <span class="badge-popular">Popular</span>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>Cybersecurity Training</h3>
               <p>Master ethical hacking, penetration testing, and security operations. Prepare for industry certifications and protect organizations from cyber threats.</p>
@@ -332,6 +332,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-gear-wide-connected"></i>
                 </div>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>DevOps Engineering</h3>
               <p>Learn containerization, CI/CD pipelines, and infrastructure automation. Deploy applications with confidence using modern DevOps practices.</p>
@@ -353,7 +354,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-cloud"></i>
                 </div>
-                <span class="badge-popular">Best Seller</span>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>Cloud Computing</h3>
               <p>Build and manage cloud infrastructure on AWS, Azure, and GCP. Prepare for cloud certifications and architect scalable solutions.</p>
@@ -375,6 +376,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-code-slash"></i>
                 </div>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>Software Development</h3>
               <p>Build complete web and mobile applications. Learn modern frameworks and best practices for professional software development.</p>
@@ -396,6 +398,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-bar-chart-line"></i>
                 </div>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>Data Science & AI</h3>
               <p>Unlock the power of data. Learn machine learning, data analysis, and AI implementation for real-world business problems.</p>
@@ -417,6 +420,7 @@ foreach ($categoriesRaw as $cat) {
                 <div class="icon-wrapper">
                   <i class="bi bi-hdd-network"></i>
                 </div>
+                <span class="badge-popular">Coming Soon</span>
               </div>
               <h3>System Administration</h3>
               <p>Master Linux and Windows server administration. Learn to manage enterprise infrastructure and maintain system reliability.</p>
