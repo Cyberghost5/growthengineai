@@ -1,6 +1,6 @@
 <?php
 /**
- * GrowthEngineAI LMS - Student Community (Slack Integration)
+ * GrowthEngineAI LMS - Student Community ( Integration)
  */
 
 require_once __DIR__ . '/../classes/Auth.php';
@@ -11,9 +11,9 @@ $auth->requireRole('student');
 
 $user = $auth->getCurrentUser();
 
-// Slack workspace configuration
-$slackWorkspaceUrl = 'https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA'; // Replace with your Slack invite link
-$slackWorkspaceName = 'GrowthEngineAI Community';
+//  workspace configuration
+$whatsappWorkspaceUrl = 'https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85'; // Replace with your  invite link
+$whatsappWorkspaceName = 'GrowthEngineAI Community';
 
 // Community channels
 $channels = [
@@ -223,7 +223,7 @@ $benefits = [
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        .slack-hero {
+        .whatsapp-hero {
             background: linear-gradient(135deg, #4A154B 0%, #611f69 100%);
             color: white;
             border-radius: 16px;
@@ -232,7 +232,7 @@ $benefits = [
             position: relative;
             overflow: hidden;
         }
-        .slack-hero::before {
+        .whatsapp-hero::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -242,7 +242,7 @@ $benefits = [
             background: rgba(255,255,255,0.05);
             border-radius: 50%;
         }
-        .slack-hero::after {
+        .whatsapp-hero::after {
             content: '';
             position: absolute;
             bottom: -30%;
@@ -252,18 +252,18 @@ $benefits = [
             background: rgba(255,255,255,0.03);
             border-radius: 50%;
         }
-        .slack-hero h2 {
+        .whatsapp-hero h2 {
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
             font-size: 2rem;
             margin-bottom: 15px;
         }
-        .slack-logo {
+        .whatsapp-logo {
             width: 60px;
             height: 60px;
             margin-bottom: 20px;
         }
-        .btn-slack {
+        .btn-whatsapp {
             background: white;
             color: #4A154B;
             border: none;
@@ -276,13 +276,13 @@ $benefits = [
             gap: 10px;
             transition: all 0.3s ease;
         }
-        .btn-slack:hover {
+        .btn-whatsapp:hover {
             background: #f8f9fa;
             color: #4A154B;
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
-        .btn-slack svg {
+        .btn-whatsapp svg {
             width: 24px;
             height: 24px;
         }
@@ -515,27 +515,27 @@ $benefits = [
 
             <!-- Main Content -->
             <div class="col-lg-12">
-                <!-- Slack Hero Section -->
-                <div class="slack-hero">
+                <!--  Hero Section -->
+                <div class="whatsapp-hero">
                     <div class="row align-items-center">
                         <div class="col-lg-8">
-                            <!-- Slack Logo SVG -->
-                            <svg class="slack-logo" viewBox="0 0 127 127" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!--  Logo SVG -->
+                            <svg class="whatsapp-logo" viewBox="0 0 127 127" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#E01E5A"/>
                                 <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H13.9C6.6 60.1.7 54.2.7 46.9c0-7.3 5.9-13.2 13.2-13.2H47z" fill="#36C5F0"/>
                                 <path d="M99.9 46.9c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H99.9V46.9zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V13.8C66.9 6.5 72.8.6 80.1.6c7.3 0 13.2 5.9 13.2 13.2v33.1z" fill="#2EB67D"/>
                                 <path d="M80.1 99.8c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V99.8h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33.1c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H80.1z" fill="#ECB22E"/>
                             </svg>
-                            <h2>Join Our Slack Community</h2>
+                            <h2>Join Our Whatsapp Community</h2>
                             <p class="mb-4" style="font-size: 18px; opacity: 0.9;">Connect with 2,500+ students, mentors, and AI professionals. Get help, share projects, and accelerate your learning journey.</p>
-                            <a href="<?php echo htmlspecialchars($slackWorkspaceUrl); ?>" target="_blank" class="btn-slack" style="text-decoration: none;">
+                            <a href="<?php echo htmlspecialchars($whatsappWorkspaceUrl); ?>" target="_blank" class="btn-whatsapp" style="text-decoration: none;">
                                 <svg viewBox="0 0 127 127" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#E01E5A"/>
                                     <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H13.9C6.6 60.1.7 54.2.7 46.9c0-7.3 5.9-13.2 13.2-13.2H47z" fill="#36C5F0"/>
                                     <path d="M99.9 46.9c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H99.9V46.9zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V13.8C66.9 6.5 72.8.6 80.1.6c7.3 0 13.2 5.9 13.2 13.2v33.1z" fill="#2EB67D"/>
                                     <path d="M80.1 99.8c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V99.8h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33.1c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H80.1z" fill="#ECB22E"/>
                                 </svg>
-                                Join Slack Workspace
+                                Join  Workspace
                             </a>
                             <div class="community-stats">
                                 <div class="stat-item">
@@ -553,7 +553,7 @@ $benefits = [
                             </div>
                         </div>
                         <div class="col-lg-4 d-none d-lg-block text-center">
-                            <img src="https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png" alt="Slack" style="width: 200px; opacity: 0.3;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" style="width: 200px; opacity: 0.3;">
                         </div>
                     </div>
                 </div>

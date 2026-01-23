@@ -1150,7 +1150,7 @@ url("../fonts/bootstrap-icons.woff") format("woff");
 .bi-skip-start-circle::before { content: "\f562"; }
 .bi-skip-start-fill::before { content: "\f563"; }
 .bi-skip-start::before { content: "\f564"; }
-.bi-slack::before { content: "\f565"; }
+.bi-whatsapp::before { content: "\f565"; }
 .bi-slash-circle-fill::before { content: "\f566"; }
 .bi-slash-circle::before { content: "\f567"; }
 .bi-slash-square-fill::before { content: "\f568"; }

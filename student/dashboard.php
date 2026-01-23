@@ -366,7 +366,7 @@ $enrolledCourses = $courseModel->getEnrolledCourses($user['id']);
                                     <i class="bi bi-search me-1"></i> Browse Courses
                                 </a>
                                 <a href="<?php echo Url::community(); ?>" class="btn btn-outline-primary">
-                                    <i class="bi bi-slack me-1"></i> Join Slack Community
+                                    <i class="bi bi-whatsapp me-1"></i> Join Whatsapp Community
                                 </a>
                                 <a href="<?php echo Url::settings(); ?>" class="btn btn-outline-primary">
                                     <i class="bi bi-person-circle me-1"></i> Edit Profile

@@ -100,9 +100,9 @@ if (isset($_GET['error'])) {
                             <i class="bi bi-book"></i>
                             <span>Access Premium Courses</span>
                         </div>
-                        <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" class="auth-feature">
-                            <i class="bi bi-slack"></i>
-                            <span>Join Slack Community</span>
+                        <a href="https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" class="auth-feature">
+                            <i class="bi bi-whatsapp"></i>
+                            <span>Join Whatsapp Community</span>
                         </a>
                         <div class="auth-feature">
                             <i class="bi bi-graph-up"></i>

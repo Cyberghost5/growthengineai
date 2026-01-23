@@ -66,7 +66,7 @@ foreach ($categoriesRaw as $cat) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>GrowthEngineAI - Your Partner in Intelligent Transformation</title>
-  <meta name="description" content="GrowthEngineAI offers premium tech courses in cybersecurity, DevOps, and more. Join our thriving Slack community and accelerate your tech career.">
+  <meta name="description" content="GrowthEngineAI offers premium tech courses in cybersecurity, DevOps, and more. Join our thriving Whatsapp community and accelerate your tech career.">
   <meta name="keywords" content="tech courses, cybersecurity training, DevOps courses, AI learning platform, online tech education">
 
   <meta name="robots" content="noindex, nofollow">
@@ -133,7 +133,7 @@ foreach ($categoriesRaw as $cat) {
                 <span class="badge">🚀 Your Partner in Intelligent Transformation</span>
               </div>
               <h1>AI-Powered Business Automation</h1>
-              <p>Accelerate your tech career with premium courses in Cybersecurity, DevOps, Cloud Computing, and more. Join our exclusive Slack community and learn from industry experts.</p>
+              <p>Accelerate your tech career with premium courses in Cybersecurity, DevOps, Cloud Computing, and more. Join our exclusive Whatsapp community and learn from industry experts.</p>
               <div class="hero-buttons">
                 <a href="auth/login" class="btn btn-primary">
                   <span>Get Started</span>
@@ -163,11 +163,11 @@ foreach ($categoriesRaw as $cat) {
                 </div>
                 <div class="floating-card card-2" data-aos="fade-up" data-aos-delay="500">
                   <div class="card-icon">
-                    <i class="bi bi-slack"></i>
+                    <i class="bi bi-whatsapp"></i>
                   </div>
                   <div class="card-content">
                     <div class="card-value">Active</div>
-                    <div class="card-label">Slack Community</div>
+                    <div class="card-label">Whatsapp Community</div>
                   </div>
                 </div>
                 <div class="floating-card card-3" data-aos="fade-up" data-aos-delay="600">
@@ -204,7 +204,7 @@ foreach ($categoriesRaw as $cat) {
             <div class="content-wrapper">
               <div class="section-badge">About Us</div>
               <h2>Empowering the Next Generation of Tech Professionals</h2>
-              <p class="lead">GrowthEngineAI is a cutting-edge learning platform designed for individuals who want to excel in today's competitive tech industry. We offer premium courses in high-demand fields like Cybersecurity, DevOps, Cloud Computing, and more—backed by our thriving Slack community where learners connect, collaborate, and grow together.</p>
+              <p class="lead">GrowthEngineAI is a cutting-edge learning platform designed for individuals who want to excel in today's competitive tech industry. We offer premium courses in high-demand fields like Cybersecurity, DevOps, Cloud Computing, and more—backed by our thriving Whatsapp community where learners connect, collaborate, and grow together.</p>
 
               <div class="stats-grid">
                 <div class="stat-item">
@@ -228,10 +228,10 @@ foreach ($categoriesRaw as $cat) {
               <div class="features-row">
                 <div class="feature-item">
                   <div class="feature-icon">
-                    <i class="bi bi-slack"></i>
+                    <i class="bi bi-whatsapp"></i>
                   </div>
                   <div class="feature-content">
-                    <h4>Exclusive Slack Community</h4>
+                    <h4>Exclusive Whatsapp Community</h4>
                     <p>Connect with fellow learners, get instant support, and network with industry professionals in our active community.</p>
                   </div>
                 </div>
@@ -248,7 +248,7 @@ foreach ($categoriesRaw as $cat) {
 
               <div class="cta-group">
                 <a href="#services" class="btn btn-primary">Explore Courses <i class="bi bi-arrow-right"></i></a>
-                <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" class="btn btn-secondary">Join Community</a>
+                <a href="https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85" class="btn btn-secondary">Join Community</a>
               </div>
             </div>
           </div>
@@ -528,12 +528,12 @@ foreach ($categoriesRaw as $cat) {
               <div class="cta-content">
                 <div class="cta-badge">Ready to Learn?</div>
                 <h3>Start Your Tech Career Journey Today</h3>
-                <p>Join thousands of learners who are transforming their careers with GrowthEngineAI. Get access to premium courses and our exclusive Slack community.</p>
+                <p>Join thousands of learners who are transforming their careers with GrowthEngineAI. Get access to premium courses and our exclusive Whatsapp community.</p>
               </div>
             </div>
             <div class="col-lg-4 text-lg-end">
               <a href="auth/login" class="btn-primary">Get Started <i class="bi bi-arrow-right"></i></a>
-              <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" target="_blank" class="btn-secondary">Join Community</a>
+              <a href="https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85" target="_blank" class="btn-secondary">Join Community</a>
             </div>
           </div>
         </div>
@@ -558,7 +558,7 @@ foreach ($categoriesRaw as $cat) {
             <div class="intro-content">
               <span class="badge">Why Choose Us</span>
               <h2>Learn From the Best, Become the Best</h2>
-              <p class="lead">GrowthEngineAI stands out with our unique combination of premium courses, hands-on projects, and an exclusive Slack community where you connect directly with instructors and fellow learners. We're building the future of tech education.</p>
+              <p class="lead">GrowthEngineAI stands out with our unique combination of premium courses, hands-on projects, and an exclusive Whatsapp community where you connect directly with instructors and fellow learners. We're building the future of tech education.</p>
               <div class="stats-grid">
                 <div class="stat-item">
                   <div class="stat-number" data-purecounter-start="0" data-purecounter-end="10" data-purecounter-duration="2">10+</div>
@@ -587,11 +587,11 @@ foreach ($categoriesRaw as $cat) {
           <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
             <div class="value-card">
               <div class="icon-box">
-                <i class="bi bi-slack"></i>
+                <i class="bi bi-whatsapp"></i>
               </div>
-              <h4>Exclusive Slack Community</h4>
+              <h4>Exclusive Whatsapp Community</h4>
               <p>Connect with instructors and peers in real-time. Get your questions answered, collaborate on projects, and build your professional network.</p>
-              <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" class="learn-more">Join Community <i class="bi bi-arrow-right"></i></a>
+              <a href="https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85" class="learn-more">Join Community <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
 
@@ -637,9 +637,9 @@ foreach ($categoriesRaw as $cat) {
                 <div class="capability-item">
                   <div class="capability-header">
                     <i class="bi bi-check-circle-fill"></i>
-                    <h5>Active Slack Community</h5>
+                    <h5>Active Whatsapp Community</h5>
                   </div>
-                  <p>Unlike other platforms, we provide a thriving Slack community where you can network, collaborate, and get real-time support.</p>
+                  <p>Unlike other platforms, we provide a thriving Whatsapp community where you can network, collaborate, and get real-time support.</p>
                 </div>
 
                 <div class="capability-item">
@@ -731,7 +731,7 @@ foreach ($categoriesRaw as $cat) {
                   <div class="col-lg-8">
                     <h2>The Cybersecurity course changed my career</h2>
                     <p>
-                      I was stuck in a dead-end IT support job until I found GrowthEngineAI. The Ethical Hacking course was incredibly comprehensive and hands-on. The Slack community was invaluable - I got help whenever I was stuck.
+                      I was stuck in a dead-end IT support job until I found GrowthEngineAI. The Ethical Hacking course was incredibly comprehensive and hands-on. The Whatsapp community was invaluable - I got help whenever I was stuck.
                     </p>
                     <p>
                       Within 3 months of completing the course, I landed a junior penetration tester role. The practical skills I learned here made all the difference in my interviews. Highly recommended for anyone serious about tech!
@@ -762,7 +762,7 @@ foreach ($categoriesRaw as $cat) {
                       As someone transitioning from traditional development to DevOps, I needed structured, practical training. GrowthEngineAI's Docker & Kubernetes course was exactly what I needed. The instructors explain complex concepts clearly.
                     </p>
                     <p>
-                      What really sets this platform apart is the Slack community. I've made connections with professionals from around the world and even collaborated on open-source projects. This isn't just a course platform, it's a career launchpad.
+                      What really sets this platform apart is the Whatsapp community. I've made connections with professionals from around the world and even collaborated on open-source projects. This isn't just a course platform, it's a career launchpad.
                     </p>
                     <div class="profile d-flex align-items-center">
                       <img src="images/person-f-8.webp" class="profile-img" alt="">
@@ -792,7 +792,7 @@ foreach ($categoriesRaw as $cat) {
                       I tried learning AWS on my own for months but kept getting overwhelmed. The AWS Solutions Architect course here broke everything down into manageable pieces. The hands-on labs were game-changers.
                     </p>
                     <p>
-                      The Slack community helped me prepare for my certification exam. Other students shared their experiences and tips. I passed on my first attempt! Now working remotely as a cloud engineer. Thank you GrowthEngineAI!
+                      The Whatsapp community helped me prepare for my certification exam. Other students shared their experiences and tips. I passed on my first attempt! Now working remotely as a cloud engineer. Thank you GrowthEngineAI!
                     </p>
                     <div class="profile d-flex align-items-center">
                       <img src="images/person-m-9.webp" class="profile-img" alt="">
@@ -820,7 +820,7 @@ foreach ($categoriesRaw as $cat) {
                       I had no programming background when I started the Full-Stack Web Development course. The curriculum was well-structured and the instructors were patient. The projects gave me real confidence.
                     </p>
                     <p>
-                      The best part? The Slack community is so supportive. Whenever I got stuck on a bug, someone was always there to help. I've now built three complete web applications and I'm freelancing on the side. GrowthEngineAI changed my life!
+                      The best part? The Whatsapp community is so supportive. Whenever I got stuck on a bug, someone was always there to help. I've now built three complete web applications and I'm freelancing on the side. GrowthEngineAI changed my life!
                     </p>
                     <div class="profile d-flex align-items-center">
                       <img src="images/person-f-10.webp" class="profile-img" alt="">
@@ -872,7 +872,7 @@ foreach ($categoriesRaw as $cat) {
                 <span>Start Your Learning Journey</span>
               </div>
               <h2>Ready to Level Up Your Tech Skills?</h2>
-              <p>Join GrowthEngineAI today and gain access to premium courses, hands-on projects, and our exclusive Slack community. Whether you're starting from scratch or advancing your career, we're here to help you succeed.</p>
+              <p>Join GrowthEngineAI today and gain access to premium courses, hands-on projects, and our exclusive Whatsapp community. Whether you're starting from scratch or advancing your career, we're here to help you succeed.</p>
             </div>
 
             <div class="contact-channels">
@@ -921,7 +921,7 @@ foreach ($categoriesRaw as $cat) {
               </div>
               <div class="indicator-item">
                 <div class="indicator-value">Free</div>
-                <div class="indicator-label">Slack Community</div>
+                <div class="indicator-label">Whatsapp Community</div>
               </div>
             </div>
           </div>

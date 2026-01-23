@@ -128,9 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-lightning"></i>
                             <span>Instant Access</span>
                         </div>
-                        <a href="https://join.slack.com/t/growthengineaigroup/shared_invite/zt-3mde1tz0h-xtBvxaUbVwIYCipII1rnfA" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" class="auth-feature">
-                            <i class="bi bi-slack"></i>
-                            <span>Join Slack Community</span>
+                        <a href="https://chat.whatsapp.com/DwgxaHl0Po6FT1tIK9uV85" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" class="auth-feature">
+                            <i class="bi bi-whatsapp"></i>
+                            <span>Join Whatsapp Community</span>
                         </a>
                     </div>
                 </div>
