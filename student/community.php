@@ -224,7 +224,7 @@ $benefits = [
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         .whatsapp-hero {
-            background: linear-gradient(135deg, #075E54  0%, #128C7E 100%);
+            background: linear-gradient(135deg, #075E54  0%, #25D366  100%);
             color: white;
             border-radius: 16px;
             padding: 40px;
