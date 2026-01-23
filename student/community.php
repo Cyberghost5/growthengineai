@@ -524,7 +524,7 @@ $benefits = [
                             <p class="mb-4" style="font-size: 18px; opacity: 0.9;">Connect with 2,500+ students, mentors, and AI professionals. Get help, share projects, and accelerate your learning journey.</p>
                             <a href="<?php echo htmlspecialchars($whatsappWorkspaceUrl); ?>" target="_blank" class="btn-whatsapp" style="text-decoration: none;">
                                 <i class="bi bi-whatsapp"></i>
-                                Join  Workspace
+                                Join Whatsapp Group
                             </a>
                             <div class="community-stats">
                                 <div class="stat-item">
