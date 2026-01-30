@@ -158,10 +158,81 @@ class User {
         $enrollStmt->execute([(int)$userId]);
         $enrollments = $enrollStmt->fetchAll();
 
+        $logStmt = $this->db->prepare("
+            SELECT action, description, ip_address, user_agent, created_at
+            FROM activity_logs
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 50
+        ");
+        $logStmt->execute([(int)$userId]);
+        $activityLogs = $logStmt->fetchAll();
+
         return [
             'user' => $user,
             'latest_session' => $latestSession,
-            'enrollments' => $enrollments
+            'enrollments' => $enrollments,
+            'activity_logs' => $activityLogs
         ];
+    }
+
+    /**
+     * Update a user's role and status.
+     */
+    public function updateRoleStatus($userId, $role, $status) {
+        $validRoles = ['admin', 'student', 'tutor'];
+        $validStatuses = ['active', 'inactive', 'suspended', 'pending'];
+
+        if (!in_array($role, $validRoles, true)) {
+            return ['success' => false, 'message' => 'Invalid role selected.'];
+        }
+
+        if (!in_array($status, $validStatuses, true)) {
+            return ['success' => false, 'message' => 'Invalid status selected.'];
+        }
+
+        $stmt = $this->db->prepare("UPDATE users SET role = :role, status = :status WHERE id = :id");
+        $success = $stmt->execute([
+            ':role' => $role,
+            ':status' => $status,
+            ':id' => (int)$userId
+        ]);
+
+        return ['success' => $success];
+    }
+
+    /**
+     * Set a new password for a user.
+     */
+    public function setPassword($userId, $password) {
+        if (strlen($password) < 8) {
+            return ['success' => false, 'message' => 'Password must be at least 8 characters long.'];
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("UPDATE users SET password = :password WHERE id = :id");
+        $success = $stmt->execute([
+            ':password' => $hashedPassword,
+            ':id' => (int)$userId
+        ]);
+
+        return ['success' => $success];
+    }
+
+    /**
+     * Log admin activity.
+     */
+    public function logActivity($userId, $action, $description) {
+        $stmt = $this->db->prepare("
+            INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent)
+            VALUES (:user_id, :action, :description, :ip, :user_agent)
+        ");
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':action' => $action,
+            ':description' => $description,
+            ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
     }
 }

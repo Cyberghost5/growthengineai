@@ -9,6 +9,7 @@ require_once __DIR__ . '/../classes/User.php';
 $auth = new Auth();
 $auth->requireRole('admin');
 
+$currentAdmin = $auth->getCurrentUser();
 $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($userId <= 0) {
     header('Location: users.php');
@@ -23,9 +24,67 @@ if (!$detail) {
     exit;
 }
 
+$errors = [];
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if ((int)$currentAdmin['id'] === $userId && $action === 'update_user') {
+        $errors[] = 'You cannot change your own role or status.';
+    } else {
+        if ($action === 'update_user') {
+            $newRole = trim($_POST['role'] ?? '');
+            $newStatus = trim($_POST['status'] ?? '');
+
+            $update = $userModel->updateRoleStatus($userId, $newRole, $newStatus);
+            if ($update['success']) {
+                $userModel->logActivity(
+                    $currentAdmin['id'],
+                    'admin_user_update',
+                    'Updated user ' . $detail['user']['email'] . ' role/status.'
+                );
+                $success = 'User updated successfully.';
+            } else {
+                $errors[] = $update['message'] ?? 'Failed to update user.';
+            }
+        }
+
+        if ($action === 'reset_password') {
+            $newPassword = $_POST['new_password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            if ($newPassword === '' || $confirmPassword === '') {
+                $errors[] = 'Password fields are required.';
+            } elseif ($newPassword !== $confirmPassword) {
+                $errors[] = 'Passwords do not match.';
+            } else {
+                $reset = $userModel->setPassword($userId, $newPassword);
+                if ($reset['success']) {
+                    $userModel->logActivity(
+                        $currentAdmin['id'],
+                        'admin_password_reset',
+                        'Reset password for user ' . $detail['user']['email'] . '.'
+                    );
+                    $success = 'Password reset successfully.';
+                } else {
+                    $errors[] = $reset['message'] ?? 'Failed to reset password.';
+                }
+            }
+        }
+    }
+
+    $detail = $userModel->getUserDetail($userId);
+    $user = $detail['user'];
+    $latestSession = $detail['latest_session'];
+    $enrollments = $detail['enrollments'];
+    $activityLogs = $detail['activity_logs'];
+}
+
 $user = $detail['user'];
 $latestSession = $detail['latest_session'];
 $enrollments = $detail['enrollments'];
+$activityLogs = $detail['activity_logs'];
 
 function formatDateTime($value) {
     if (!$value) {
@@ -268,6 +327,17 @@ function formatDateTime($value) {
                         </a>
                     </div>
 
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($errors)): ?>
+                        <div class="alert alert-danger">
+                            <?php foreach ($errors as $error): ?>
+                                <div><?php echo htmlspecialchars($error); ?></div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="border rounded-3 p-3 h-100">
@@ -309,6 +379,58 @@ function formatDateTime($value) {
                     </div>
                 </div>
 
+                <div class="card p-4 mb-4">
+                    <h4 class="mb-3">Admin Actions</h4>
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <form method="POST" class="border rounded-3 p-3 h-100">
+                                <input type="hidden" name="action" value="update_user">
+                                <h6 class="mb-3">Update Role & Status</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Role</label>
+                                    <select name="role" class="form-select" required>
+                                        <option value="admin" <?php echo $user['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                        <option value="student" <?php echo $user['role'] === 'student' ? 'selected' : ''; ?>>Student</option>
+                                        <option value="tutor" <?php echo $user['role'] === 'tutor' ? 'selected' : ''; ?>>Tutor</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select" required>
+                                        <option value="active" <?php echo $user['status'] === 'active' ? 'selected' : ''; ?>>Active</option>
+                                        <option value="pending" <?php echo $user['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                        <option value="inactive" <?php echo $user['status'] === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                                        <option value="suspended" <?php echo $user['status'] === 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-1"></i> Save Changes
+                                </button>
+                                <?php if ((int)$currentAdmin['id'] === $userId): ?>
+                                    <div class="text-muted small mt-2">You cannot change your own role or status.</div>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                        <div class="col-lg-6">
+                            <form method="POST" class="border rounded-3 p-3 h-100">
+                                <input type="hidden" name="action" value="reset_password">
+                                <h6 class="mb-3">Reset Password</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" name="new_password" class="form-control" minlength="8" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" name="confirm_password" class="form-control" minlength="8" required>
+                                </div>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="bi bi-key me-1"></i> Reset Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card p-4">
                     <h4 class="mb-3">Enrollments</h4>
                     <?php if (empty($enrollments)): ?>
@@ -333,6 +455,36 @@ function formatDateTime($value) {
                                         <td class="text-capitalize"><?php echo htmlspecialchars($enrollment['status']); ?></td>
                                         <td><?php echo number_format((float)$enrollment['progress_percent'], 2); ?>%</td>
                                         <td><?php echo number_format((float)$enrollment['amount_paid'], 2); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="card p-4 mt-4">
+                    <h4 class="mb-3">Activity Logs</h4>
+                    <?php if (empty($activityLogs)): ?>
+                        <div class="text-muted text-center py-4">No activity logs found.</div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Action</th>
+                                        <th>Description</th>
+                                        <th>IP Address</th>
+                                        <th>When</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php foreach ($activityLogs as $log): ?>
+                                    <tr>
+                                        <td class="text-capitalize"><?php echo htmlspecialchars(str_replace('_', ' ', $log['action'])); ?></td>
+                                        <td><?php echo $log['description'] ? htmlspecialchars($log['description']) : '—'; ?></td>
+                                        <td><?php echo $log['ip_address'] ? htmlspecialchars($log['ip_address']) : '—'; ?></td>
+                                        <td><?php echo formatDateTime($log['created_at']); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 </tbody>
