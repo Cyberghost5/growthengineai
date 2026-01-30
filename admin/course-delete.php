@@ -1,7 +1,6 @@
 <?php
 /**
- * GrowthEngineAI LMS - Admin Course Management
- * List and manage courses
+ * GrowthEngineAI LMS - Admin Delete Course
  */
 
 require_once __DIR__ . '/../classes/Auth.php';
@@ -11,36 +10,52 @@ $auth = new Auth();
 $auth->requireRole('admin');
 
 $db = getDB();
-$success = '';
+$errors = [];
 
-if (isset($_GET['created'])) {
-    $success = 'Course created successfully.';
-}
-if (isset($_GET['updated'])) {
-    $success = 'Course updated successfully.';
-}
-if (isset($_GET['deleted'])) {
-    $success = 'Course deleted successfully.';
+$courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($courseId <= 0) {
+    header('Location: courses.php');
+    exit;
 }
 
-$recentCourses = $db->query("
-    SELECT c.id, c.title, c.slug, c.status, c.is_free, c.price, c.created_at,
-           cat.name AS category_name,
-           CONCAT(u.first_name, ' ', u.last_name) AS instructor_name
-    FROM courses c
-    JOIN categories cat ON c.category_id = cat.id
-    JOIN instructors i ON c.instructor_id = i.id
-    JOIN users u ON i.user_id = u.id
-    ORDER BY c.id DESC
-    LIMIT 50
-")->fetchAll();
+$stmt = $db->prepare("SELECT id, title, instructor_id FROM courses WHERE id = ?");
+$stmt->execute([$courseId]);
+$course = $stmt->fetch();
+
+if (!$course) {
+    header('Location: courses.php?error=not_found');
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $confirm = $_POST['confirm_delete'] ?? '';
+    if ($confirm !== 'yes') {
+        $errors[] = 'Please confirm deletion.';
+    } else {
+        $db->beginTransaction();
+        try {
+            $deleteStmt = $db->prepare("DELETE FROM courses WHERE id = ?");
+            $deleteStmt->execute([$courseId]);
+
+            $db->prepare("UPDATE instructors SET total_courses = GREATEST(total_courses - 1, 0) WHERE id = ?")
+                ->execute([(int)$course['instructor_id']]);
+
+            $db->commit();
+            header('Location: courses.php?deleted=1');
+            exit;
+        } catch (Exception $e) {
+            $db->rollBack();
+            $errors[] = 'Failed to delete course. Please try again.';
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Courses - GrowthEngineAI Admin</title>
+    <title>Delete Course - GrowthEngineAI Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -174,13 +189,6 @@ $recentCourses = $db->query("
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        .table thead th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
     </style>
 </head>
 <body>
@@ -194,7 +202,7 @@ $recentCourses = $db->query("
                 </div>
                 <div class="welcome-text">
                     <h1>Admin Dashboard</h1>
-                    <p class="mb-0">Create and manage courses</p>
+                    <p class="mb-0">Delete course</p>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <span class="badge bg-light px-3 py-2" style="color: #000016 !important;">
@@ -243,75 +251,41 @@ $recentCourses = $db->query("
                 </div>
             </div>
 
-            <div class="col-lg-11 mx-auto">
+            <div class="col-lg-8 mx-auto">
                 <div class="card p-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
-                            <h2 class="mb-1">Courses</h2>
-                            <p class="text-muted mb-0">Manage existing courses or create new ones.</p>
+                            <h2 class="mb-1">Delete Course</h2>
+                            <p class="text-muted mb-0">You are about to delete <strong><?php echo htmlspecialchars($course['title']); ?></strong>.</p>
                         </div>
-                        <a href="course-create.php" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-1"></i> New Course
+                        <a href="courses.php" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Courses
                         </a>
                     </div>
 
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+                    <?php if (!empty($errors)): ?>
+                        <div class="alert alert-danger">
+                            <?php foreach ($errors as $error): ?>
+                                <div><?php echo htmlspecialchars($error); ?></div>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
 
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Instructor</th>
-                                    <th>Status</th>
-                                    <th>Price</th>
-                                    <th>Actions</th>
-                                    <th>Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recentCourses as $course): ?>
-                                    <tr>
-                                        <td><?php echo (int)$course['id']; ?></td>
-                                        <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['category_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['instructor_name']); ?></td>
-                                        <td>
-                                            <span class="badge bg-<?php echo $course['status'] === 'published' ? 'success' : ($course['status'] === 'draft' ? 'secondary' : 'warning'); ?>">
-                                                <?php echo htmlspecialchars(str_replace('_', ' ', $course['status'])); ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php echo $course['is_free'] ? 'Free' : number_format((float)$course['price'], 2); ?>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                <a class="btn btn-sm btn-outline-primary" href="course-content.php?course_id=<?php echo (int)$course['id']; ?>">
-                                                    Manage Content
-                                                </a>
-                                                <a class="btn btn-sm btn-outline-secondary" href="course-edit.php?id=<?php echo (int)$course['id']; ?>">
-                                                    Edit
-                                                </a>
-                                                <a class="btn btn-sm btn-outline-danger" href="course-delete.php?id=<?php echo (int)$course['id']; ?>">
-                                                    Delete
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($course['created_at']); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                <?php if (!$recentCourses): ?>
-                                    <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">No courses found yet.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                    <div class="alert alert-warning">
+                        Deleting a course will remove all related modules, lessons, quizzes, and enrollments.
                     </div>
+
+                    <form method="POST">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_delete" name="confirm_delete" value="yes">
+                            <label class="form-check-label" for="confirm_delete">
+                                I understand this action cannot be undone.
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Delete Course
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
