@@ -112,4 +112,56 @@ class User {
             'total_pages' => $perPage > 0 ? (int)ceil($total / $perPage) : 0
         ];
     }
+
+    /**
+     * Get a single user with latest session and enrollments.
+     */
+    public function getUserDetail($userId) {
+        $stmt = $this->db->prepare("
+            SELECT id, first_name, last_name, email, phone, role, status, profile_image,
+                   bio, created_at, last_login
+            FROM users
+            WHERE id = ?
+        ");
+        $stmt->execute([(int)$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return null;
+        }
+
+        $sessionStmt = $this->db->prepare("
+            SELECT ip_address, user_agent, created_at, expires_at
+            FROM user_sessions
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        ");
+        $sessionStmt->execute([(int)$userId]);
+        $latestSession = $sessionStmt->fetch();
+
+        $enrollStmt = $this->db->prepare("
+            SELECT
+                e.id,
+                e.enrolled_at,
+                e.status,
+                e.progress_percent,
+                e.amount_paid,
+                c.id AS course_id,
+                c.title AS course_title,
+                c.slug AS course_slug
+            FROM enrollments e
+            JOIN courses c ON e.course_id = c.id
+            WHERE e.user_id = ?
+            ORDER BY e.enrolled_at DESC
+        ");
+        $enrollStmt->execute([(int)$userId]);
+        $enrollments = $enrollStmt->fetchAll();
+
+        return [
+            'user' => $user,
+            'latest_session' => $latestSession,
+            'enrollments' => $enrollments
+        ];
+    }
 }

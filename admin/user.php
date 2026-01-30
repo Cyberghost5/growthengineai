@@ -1,7 +1,6 @@
 <?php
 /**
- * GrowthEngineAI LMS - Admin Users
- * View users with enrollment summary and login info.
+ * GrowthEngineAI LMS - Admin User Detail
  */
 
 require_once __DIR__ . '/../classes/Auth.php';
@@ -10,26 +9,23 @@ require_once __DIR__ . '/../classes/User.php';
 $auth = new Auth();
 $auth->requireRole('admin');
 
+$userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($userId <= 0) {
+    header('Location: users.php');
+    exit;
+}
+
 $userModel = new User();
+$detail = $userModel->getUserDetail($userId);
 
-$search = trim($_GET['search'] ?? '');
-$role = trim($_GET['role'] ?? '');
-$status = trim($_GET['status'] ?? '');
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$page = $page > 0 ? $page : 1;
-$perPage = 20;
+if (!$detail) {
+    header('Location: users.php?error=not_found');
+    exit;
+}
 
-$result = $userModel->getUsers([
-    'search' => $search,
-    'role' => $role,
-    'status' => $status,
-    'page' => $page,
-    'per_page' => $perPage
-]);
-
-$users = $result['users'];
-$total = $result['total'];
-$totalPages = $result['total_pages'];
+$user = $detail['user'];
+$latestSession = $detail['latest_session'];
+$enrollments = $detail['enrollments'];
 
 function formatDateTime($value) {
     if (!$value) {
@@ -41,27 +37,13 @@ function formatDateTime($value) {
     }
     return date('M j, Y g:i A', $timestamp);
 }
-
-function buildQuery(array $base, array $overrides = []) {
-    $params = array_merge($base, $overrides);
-    $params = array_filter($params, function ($value) {
-        return $value !== '' && $value !== null;
-    });
-    return http_build_query($params);
-}
-
-$baseQuery = [
-    'search' => $search,
-    'role' => $role,
-    'status' => $status
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users - GrowthEngineAI Admin</title>
+    <title>User Details - GrowthEngineAI Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -195,13 +177,6 @@ $baseQuery = [
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        .table thead th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
         .badge-role {
             background: #e2e8f0;
             color: #334155;
@@ -213,6 +188,12 @@ $baseQuery = [
         .badge-status.pending { background: #fef3c7; color: #92400e; }
         .badge-status.inactive { background: #e2e8f0; color: #475569; }
         .badge-status.suspended { background: #fee2e2; color: #b91c1c; }
+        .meta-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body>
@@ -226,7 +207,7 @@ $baseQuery = [
                 </div>
                 <div class="welcome-text">
                     <h1>Admin Dashboard</h1>
-                    <p class="mb-0">Manage all users and enrollments</p>
+                    <p class="mb-0">User details</p>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <span class="badge bg-light px-3 py-2" style="color: #000016 !important;">
@@ -277,102 +258,86 @@ $baseQuery = [
 
             <div class="col-lg-11 mx-auto">
                 <div class="card p-4 mb-4">
-                    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
                         <div>
-                            <h2 class="mb-1">Users</h2>
-                            <p class="text-muted mb-0">Total users: <?php echo number_format($total); ?></p>
+                            <h2 class="mb-1"><?php echo htmlspecialchars(trim($user['first_name'] . ' ' . $user['last_name'])); ?></h2>
+                            <div class="text-muted"><?php echo htmlspecialchars($user['email']); ?></div>
                         </div>
-                        <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
-                            <input type="text" name="search" class="form-control" placeholder="Search name or email" value="<?php echo htmlspecialchars($search); ?>">
-                            <select name="role" class="form-select">
-                                <option value="">All roles</option>
-                                <option value="admin" <?php echo $role === 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                <option value="student" <?php echo $role === 'student' ? 'selected' : ''; ?>>Student</option>
-                                <option value="tutor" <?php echo $role === 'tutor' ? 'selected' : ''; ?>>Tutor</option>
-                            </select>
-                            <select name="status" class="form-select">
-                                <option value="">All statuses</option>
-                                <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>Active</option>
-                                <option value="pending" <?php echo $status === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                <option value="inactive" <?php echo $status === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
-                                <option value="suspended" <?php echo $status === 'suspended' ? 'selected' : ''; ?>>Suspended</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search me-1"></i> Filter
-                            </button>
-                            <a href="users.php" class="btn btn-outline-secondary">Reset</a>
-                        </form>
+                        <a href="users.php" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Users
+                        </a>
                     </div>
 
-                    <?php if (empty($users)): ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="bi bi-people fs-1 d-block mb-3"></i>
-                            No users found.
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="meta-label mb-1">Role</div>
+                                <span class="badge badge-role"><?php echo htmlspecialchars($user['role']); ?></span>
+                                <div class="meta-label mt-3 mb-1">Status</div>
+                                <span class="badge badge-status <?php echo htmlspecialchars($user['status']); ?>">
+                                    <?php echo htmlspecialchars($user['status']); ?>
+                                </span>
+                                <div class="meta-label mt-3 mb-1">Registered</div>
+                                <div><?php echo formatDateTime($user['created_at']); ?></div>
+                                <div class="meta-label mt-3 mb-1">Last Login</div>
+                                <div><?php echo formatDateTime($user['last_login']); ?></div>
+                            </div>
                         </div>
+                        <div class="col-md-8">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="meta-label mb-1">Latest Session</div>
+                                <?php if ($latestSession): ?>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">IP Address</div>
+                                            <div><?php echo htmlspecialchars($latestSession['ip_address'] ?? '—'); ?></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Session Started</div>
+                                            <div><?php echo formatDateTime($latestSession['created_at'] ?? null); ?></div>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <div class="text-muted small">User Agent</div>
+                                            <div class="small"><?php echo htmlspecialchars($latestSession['user_agent'] ?? '—'); ?></div>
+                                        </div>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="text-muted">No sessions recorded.</div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="mb-3">Enrollments</h4>
+                    <?php if (empty($enrollments)): ?>
+                        <div class="text-muted text-center py-4">No enrollments found.</div>
                     <?php else: ?>
                         <div class="table-responsive">
                             <table class="table align-middle">
                                 <thead>
                                     <tr>
-                                        <th>User</th>
-                                        <th>Role</th>
+                                        <th>Course</th>
+                                        <th>Enrolled At</th>
                                         <th>Status</th>
-                                        <th>Registered</th>
-                                        <th>Last Login</th>
-                                        <th>Enrollments</th>
-                                        <th>Latest Course</th>
-                                        <th>Last Enrolled</th>
-                                        <th></th>
+                                        <th>Progress</th>
+                                        <th>Amount Paid</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php foreach ($users as $row): ?>
+                                <?php foreach ($enrollments as $enrollment): ?>
                                     <tr>
-                                        <td>
-                                            <div class="fw-semibold"><?php echo htmlspecialchars(trim($row['first_name'] . ' ' . $row['last_name'])); ?></div>
-                                            <div class="text-muted small"><?php echo htmlspecialchars($row['email']); ?></div>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-role"><?php echo htmlspecialchars($row['role']); ?></span>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-status <?php echo htmlspecialchars($row['status']); ?>">
-                                                <?php echo htmlspecialchars($row['status']); ?>
-                                            </span>
-                                        </td>
-                                        <td><?php echo formatDateTime($row['created_at']); ?></td>
-                                        <td><?php echo formatDateTime($row['last_login']); ?></td>
-                                        <td><?php echo (int)$row['enrollments_count']; ?></td>
-                                        <td><?php echo $row['latest_course_title'] ? htmlspecialchars($row['latest_course_title']) : '—'; ?></td>
-                                        <td><?php echo formatDateTime($row['last_enrolled_at']); ?></td>
-                                        <td>
-                                            <a class="btn btn-sm btn-outline-primary" href="user.php?id=<?php echo (int)$row['id']; ?>">
-                                                View
-                                            </a>
-                                        </td>
+                                        <td><?php echo htmlspecialchars($enrollment['course_title']); ?></td>
+                                        <td><?php echo formatDateTime($enrollment['enrolled_at']); ?></td>
+                                        <td class="text-capitalize"><?php echo htmlspecialchars($enrollment['status']); ?></td>
+                                        <td><?php echo number_format((float)$enrollment['progress_percent'], 2); ?>%</td>
+                                        <td><?php echo number_format((float)$enrollment['amount_paid'], 2); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
-
-                        <?php if ($totalPages > 1): ?>
-                            <nav class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="text-muted small">
-                                    Page <?php echo $page; ?> of <?php echo $totalPages; ?>
-                                </span>
-                                <div class="btn-group">
-                                    <a class="btn btn-outline-secondary <?php echo $page <= 1 ? 'disabled' : ''; ?>"
-                                       href="users.php?<?php echo buildQuery($baseQuery, ['page' => max(1, $page - 1)]); ?>">
-                                        <i class="bi bi-chevron-left"></i> Prev
-                                    </a>
-                                    <a class="btn btn-outline-secondary <?php echo $page >= $totalPages ? 'disabled' : ''; ?>"
-                                       href="users.php?<?php echo buildQuery($baseQuery, ['page' => min($totalPages, $page + 1)]); ?>">
-                                        Next <i class="bi bi-chevron-right"></i>
-                                    </a>
-                                </div>
-                            </nav>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
