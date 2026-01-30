@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="form-group">
-                            <label for="phone">Phone Number (Optional)</label>
+                            <label for="phone">Phone/Whatsapp Number</label>
                             <div class="input-wrapper">
                                 <i class="bi bi-phone"></i>
                                 <input type="tel" 
@@ -215,7 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        name="phone" 
                                        class="form-control" 
                                        placeholder="Enter your phone number"
-                                       value="<?php echo htmlspecialchars($formData['phone']); ?>">
+                                       value="<?php echo htmlspecialchars($formData['phone']); ?>"
+                                       required>
                             </div>
                         </div>
 
