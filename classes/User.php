@@ -39,7 +39,7 @@ class User {
         $params = [];
 
         if ($search !== '') {
-            $where[] = "(u.first_name LIKE :search OR u.last_name LIKE :search OR u.email LIKE :search)";
+            $where[] = "(u.first_name LIKE :search OR u.last_name LIKE :search OR u.email LIKE :search OR u.phone LIKE :search)";
             $params[':search'] = '%' . $search . '%';
         }
 
@@ -68,6 +68,7 @@ class User {
                 u.first_name,
                 u.last_name,
                 u.email,
+                u.phone,
                 u.role,
                 u.status,
                 u.created_at,

@@ -321,6 +321,7 @@ function formatDateTime($value) {
                         <div>
                             <h2 class="mb-1"><?php echo htmlspecialchars(trim($user['first_name'] . ' ' . $user['last_name'])); ?></h2>
                             <div class="text-muted"><?php echo htmlspecialchars($user['email']); ?></div>
+                            <div class="text-muted mt-1"><?php echo $user['phone'] ? htmlspecialchars($user['phone']) : '—'; ?></div>
                         </div>
                         <a href="users.php" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-1"></i> Back to Users

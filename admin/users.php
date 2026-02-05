@@ -322,6 +322,7 @@ $baseQuery = [
                                         <th>Enrollments</th>
                                         <th>Latest Course</th>
                                         <th>Last Enrolled</th>
+                                        <th>Phone</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -345,6 +346,7 @@ $baseQuery = [
                                         <td><?php echo (int)$row['enrollments_count']; ?></td>
                                         <td><?php echo $row['latest_course_title'] ? htmlspecialchars($row['latest_course_title']) : '—'; ?></td>
                                         <td><?php echo formatDateTime($row['last_enrolled_at']); ?></td>
+                                        <td><?php echo !empty($row['phone']) ? htmlspecialchars($row['phone']) : '—'; ?></td>
                                         <td>
                                             <a class="btn btn-sm btn-outline-primary" href="user.php?id=<?php echo (int)$row['id']; ?>">
                                                 View

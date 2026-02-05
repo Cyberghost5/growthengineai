@@ -9,6 +9,27 @@ $auth = new Auth();
 $auth->requireRole('admin');
 
 $user = $auth->getCurrentUser();
+// Load models for dashboard analytics
+require_once __DIR__ . '/../classes/User.php';
+require_once __DIR__ . '/../classes/Course.php';
+
+$userModel = new User();
+$courseModel = new Course();
+
+// Total counts
+$totalStudents = (int)($userModel->getUsers(['role' => 'student', 'per_page' => 1])['total'] ?? 0);
+$totalTutors = (int)($userModel->getUsers(['role' => 'tutor', 'per_page' => 1])['total'] ?? 0);
+
+// Get published courses count via Course model
+$coursesList = $courseModel->getAllCourses(['limit' => 10000]);
+$totalCourses = is_array($coursesList) ? count($coursesList) : 0;
+
+// Total revenue from completed transactions
+$db = getDB();
+$revStmt = $db->prepare("SELECT COALESCE(SUM(amount),0) AS revenue FROM transactions WHERE status = 'completed'");
+$revStmt->execute();
+$revRow = $revStmt->fetch();
+$totalRevenue = $revRow ? (float)$revRow['revenue'] : 0.0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -249,7 +270,7 @@ $user = $auth->getCurrentUser();
                                     <i class="bi bi-people"></i>
                                 </div>
                                 <div>
-                                    <div class="stat-number">0</div>
+                                    <div class="stat-number"><?php echo number_format($totalStudents); ?></div>
                                     <div class="stat-label">Total Students</div>
                                 </div>
                             </div>
@@ -262,7 +283,7 @@ $user = $auth->getCurrentUser();
                                     <i class="bi bi-person-video3"></i>
                                 </div>
                                 <div>
-                                    <div class="stat-number">0</div>
+                                    <div class="stat-number"><?php echo number_format($totalTutors); ?></div>
                                     <div class="stat-label">Total Tutors</div>
                                 </div>
                             </div>
@@ -275,7 +296,7 @@ $user = $auth->getCurrentUser();
                                     <i class="bi bi-book"></i>
                                 </div>
                                 <div>
-                                    <div class="stat-number">0</div>
+                                    <div class="stat-number"><?php echo number_format($totalCourses); ?></div>
                                     <div class="stat-label">Total Courses</div>
                                 </div>
                             </div>
@@ -288,7 +309,7 @@ $user = $auth->getCurrentUser();
                                     <i class="bi bi-currency-dollar"></i>
                                 </div>
                                 <div>
-                                    <div class="stat-number">₦0</div>
+                                    <div class="stat-number">₦<?php echo number_format($totalRevenue, 0); ?></div>
                                     <div class="stat-label">Total Revenue</div>
                                 </div>
                             </div>
