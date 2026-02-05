@@ -5,13 +5,10 @@
  */
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../classes/Auth.php';
 
-// Simple authentication check (replace with your admin auth logic)
-session_start();
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ../auth/login');
-    exit;
-}
+$auth = new Auth();
+$auth->requireRole('admin');
 
 // Handle category creation
 $errors = [];
@@ -25,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $pdo = getPDO();
-        $stmt = $pdo->prepare('INSERT INTO categories (name, description) VALUES (?, ?)');
+        $db = getDB();
+        $stmt = $db->prepare('INSERT INTO categories (name, description, created_at) VALUES (?, ?, NOW())');
         if ($stmt->execute([$name, $description])) {
             $success = 'Category created successfully!';
         } else {
@@ -36,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch categories
-$pdo = getPDO();
-$categories = $pdo->query('SELECT * FROM categories ORDER BY id DESC')->fetchAll(PDO::FETCH_ASSOC);
+$db = getDB();
+$categories = $db->query('SELECT * FROM categories ORDER BY id DESC')->fetchAll();
 
 ?>
 <!DOCTYPE html>
