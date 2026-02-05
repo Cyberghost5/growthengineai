@@ -30,6 +30,58 @@ $revStmt = $db->prepare("SELECT COALESCE(SUM(amount),0) AS revenue FROM transact
 $revStmt->execute();
 $revRow = $revStmt->fetch();
 $totalRevenue = $revRow ? (float)$revRow['revenue'] : 0.0;
+
+// Recent activity (latest 10)
+$activityStmt = $db->prepare("SELECT al.*, CONCAT(u.first_name, ' ', u.last_name) AS user_name
+    FROM activity_logs al
+    LEFT JOIN users u ON al.user_id = u.id
+    ORDER BY al.created_at DESC
+    LIMIT 10");
+$activityStmt->execute();
+$recentActivity = $activityStmt->fetchAll();
+
+// Handle quick action: create new user
+$quickErrors = [];
+$quickSuccess = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create_user') {
+    $fn = trim($_POST['first_name'] ?? '');
+    $ln = trim($_POST['last_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $roleSel = trim($_POST['role'] ?? 'student');
+    $statusSel = trim($_POST['status'] ?? 'active');
+    $password = $_POST['password'] ?? '';
+
+    if ($fn === '') $quickErrors[] = 'First name is required.';
+    if ($ln === '') $quickErrors[] = 'Last name is required.';
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $quickErrors[] = 'Valid email is required.';
+    if ($password === '' || strlen($password) < 8) $quickErrors[] = 'Password (min 8 chars) is required.';
+
+    // check if email exists
+    if (empty($quickErrors)) {
+        $check = $db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
+        $check->execute([$email]);
+        if ($check->fetch()) {
+            $quickErrors[] = 'A user with that email already exists.';
+        }
+    }
+
+    if (empty($quickErrors)) {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $ins = $db->prepare('INSERT INTO users (first_name, last_name, email, password, role, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+        $ok = $ins->execute([$fn, $ln, $email, $hash, $roleSel, $statusSel]);
+        if ($ok) {
+            $newId = $db->lastInsertId();
+            // log activity for admin
+            $userModel->logActivity($user['id'], 'admin_create_user', 'Created user ' . $email);
+            $quickSuccess = 'User created successfully.';
+            // refresh recent activity
+            $activityStmt->execute();
+            $recentActivity = $activityStmt->fetchAll();
+        } else {
+            $quickErrors[] = 'Failed to create user.';
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -323,23 +375,37 @@ $totalRevenue = $revRow ? (float)$revRow['revenue'] : 0.0;
                 <div class="row g-4">
                     <div class="col-md-8">
                         <div class="card p-4">
-                            <h5 class="mb-3"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
-                            <p class="text-muted text-center py-5">No recent activity to display</p>
-                        </div>
+                                <h5 class="mb-3"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+                                <?php if (empty($recentActivity)): ?>
+                                    <p class="text-muted text-center py-4">No recent activity to display</p>
+                                <?php else: ?>
+                                    <div class="list-group list-group-flush">
+                                        <?php foreach ($recentActivity as $act): ?>
+                                            <div class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <div class="fw-semibold"><?php echo htmlspecialchars($act['action']); ?><?php if (!empty($act['user_name'])): ?> — <span class="text-muted small"><?php echo htmlspecialchars($act['user_name']); ?></span><?php endif; ?></div>
+                                                    <div class="text-muted small"><?php echo htmlspecialchars($act['description'] ?? ''); ?></div>
+                                                </div>
+                                                <div class="text-muted small"><?php echo date('M j, g:i A', strtotime($act['created_at'])); ?></div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                     </div>
                     <div class="col-md-4">
                         <div class="card p-4">
                             <h5 class="mb-3"><i class="bi bi-gear me-2"></i>Quick Actions</h5>
                             <div class="d-grid gap-2">
-                                <a href="#" class="btn btn-outline-primary">
-                                    <i class="bi bi-person-plus me-1"></i> Add New User
-                                </a>
-                                <a href="courses.php" class="btn btn-outline-primary">
-                                    <i class="bi bi-book me-1"></i> Create Course
-                                </a>
-                                <a href="#" class="btn btn-outline-primary">
-                                    <i class="bi bi-gear me-1"></i> Settings
-                                </a>
+                                                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                                                        <i class="bi bi-person-plus me-1"></i> Add New User
+                                                                </button>
+                                                                <a href="course-create.php" class="btn btn-outline-primary">
+                                                                        <i class="bi bi-book me-1"></i> Create Course
+                                                                </a>
+                                                                <a href="settings.php" class="btn btn-outline-primary">
+                                                                        <i class="bi bi-gear me-1"></i> Settings
+                                                                </a>
                             </div>
                         </div>
                     </div>
@@ -347,6 +413,65 @@ $totalRevenue = $revRow ? (float)$revRow['revenue'] : 0.0;
             </div>
         </div>
     </div>
+
+        <!-- Add User Modal -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="">
+                        <input type="hidden" name="action" value="create_user">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New User</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <?php if (!empty($quickErrors)): ?>
+                                <div class="alert alert-danger">
+                                    <?php foreach ($quickErrors as $e) echo '<div>' . htmlspecialchars($e) . '</div>'; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($quickSuccess): ?>
+                                <div class="alert alert-success"><?php echo htmlspecialchars($quickSuccess); ?></div>
+                            <?php endif; ?>
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="text" name="first_name" class="form-control" placeholder="First name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="last_name" class="form-control" placeholder="Last name" required>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <input type="email" name="email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <select name="role" class="form-select">
+                                        <option value="student">Student</option>
+                                        <option value="tutor">Tutor</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <select name="status" class="form-select">
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <input type="password" name="password" class="form-control" placeholder="Password (min 8 chars)" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
