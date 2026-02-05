@@ -247,6 +247,9 @@ $totalRevenue = $revRow ? (float)$revRow['revenue'] : 0.0;
                         <a class="nav-link" href="users.php">
                             <i class="bi bi-people"></i> Users
                         </a>
+                        <a class="nav-link" href="transactions.php">
+                            <i class="bi bi-receipt"></i> Transactions
+                        </a>
                         <a class="nav-link" href="settings.php">
                             <i class="bi bi-gear"></i> Settings
                         </a>
