@@ -31,6 +31,41 @@ $users = $result['users'];
 $total = $result['total'];
 $totalPages = $result['total_pages'];
 
+// Export CSV when requested
+if (isset($_GET['export']) && $_GET['export']) {
+    $exportResult = $userModel->getUsers([
+        'search' => $search,
+        'role' => $role,
+        'status' => $status,
+        'page' => 1,
+        'per_page' => 10000
+    ]);
+    $exportUsers = $exportResult['users'];
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=users_export_' . date('Ymd_His') . '.csv');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['ID','First Name','Last Name','Email','Phone','Role','Status','Registered','Last Login','Enrollments','Latest Course','Last Enrolled']);
+    foreach ($exportUsers as $row) {
+        fputcsv($out, [
+            $row['id'],
+            $row['first_name'] ?? '',
+            $row['last_name'] ?? '',
+            $row['email'] ?? '',
+            $row['phone'] ?? '',
+            $row['role'] ?? '',
+            $row['status'] ?? '',
+            $row['created_at'] ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : '',
+            $row['last_login'] ? date('Y-m-d H:i:s', strtotime($row['last_login'])) : '',
+            (int)($row['enrollments_count'] ?? 0),
+            $row['latest_course_title'] ?? '',
+            $row['last_enrolled_at'] ? date('Y-m-d H:i:s', strtotime($row['last_enrolled_at'])) : ''
+        ]);
+    }
+    fclose($out);
+    exit;
+}
+
 function formatDateTime($value) {
     if (!$value) {
         return '—';
@@ -304,6 +339,9 @@ $baseQuery = [
                                 <i class="bi bi-search me-1"></i> Filter
                             </button>
                             <a href="users.php" class="btn btn-outline-secondary">Reset</a>
+                            <a href="users.php?<?php echo buildQuery($baseQuery, ['export' => '1']); ?>" class="btn btn-success">
+                                <i class="bi bi-download me-1"></i> Export
+                            </a>
                         </form>
                     </div>
 
