@@ -4881,3 +4881,351 @@ section,
 .starter-section {
   /* Add your styles here */
 }
+/*--------------------------------------------------------------
+# Hero Enhancements (Education + Consulting)
+--------------------------------------------------------------*/
+.hero .hero-content .hero-highlight {
+  color: var(--accent-color);
+  position: relative;
+}
+
+.hero .hero-dual-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: color-mix(in srgb, var(--accent-color), transparent 93%);
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
+  border-radius: 50px;
+  padding: 10px 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.hero .hero-dual-pill .pill-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.hero .hero-dual-pill .pill-item i {
+  color: var(--accent-color);
+  font-size: 16px;
+}
+
+.hero .hero-dual-pill .pill-divider {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-color);
+  opacity: 0.6;
+}
+
+/*--------------------------------------------------------------
+# Consulting Section
+--------------------------------------------------------------*/
+.consulting {
+  padding: 80px 0;
+  background-color: var(--background-color);
+}
+
+.consulting .consulting-intro {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+}
+
+.consulting .consulting-intro .intro-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin-bottom: 12px;
+}
+
+.consulting .consulting-intro .intro-text {
+  color: color-mix(in srgb, var(--default-color), transparent 25%);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.consulting .btn-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.consulting .btn-view-all:hover {
+  background: color-mix(in srgb, var(--accent-color), black 10%);
+  transform: translateY(-2px);
+}
+
+.consulting .consulting-card {
+  background: var(--surface-color);
+  border-radius: 16px;
+  padding: 36px 32px;
+  height: 100%;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.consulting .consulting-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-color);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.consulting .consulting-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px color-mix(in srgb, var(--accent-color), transparent 85%);
+  border-color: color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.consulting .consulting-card:hover::before {
+  opacity: 1;
+}
+
+.consulting .consulting-card-featured {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.consulting .consulting-card-featured::before {
+  background: rgba(255,255,255,0.4);
+  opacity: 1;
+}
+
+.consulting .consulting-card-featured h3,
+.consulting .consulting-card-featured p {
+  color: #ffffff !important;
+}
+
+.consulting .consulting-card-featured .feature-list li,
+.consulting .consulting-card-featured .feature-list li i {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+.consulting .consulting-card-featured .icon-wrapper {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+.consulting .consulting-card-featured .icon-wrapper i {
+  color: #ffffff !important;
+}
+
+.consulting .consulting-card-featured:hover {
+  box-shadow: 0 20px 40px color-mix(in srgb, var(--accent-color), transparent 60%);
+}
+
+.consulting .featured-ribbon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.2);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.consulting .consulting-card-header {
+  margin-bottom: 20px;
+}
+
+.consulting .consulting-card .icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-color), transparent 90%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.consulting .consulting-card .icon-wrapper i {
+  font-size: 24px;
+  color: var(--accent-color);
+  transition: all 0.3s ease;
+}
+
+.consulting .consulting-card:not(.consulting-card-featured):hover .icon-wrapper {
+  background: var(--accent-color);
+}
+
+.consulting .consulting-card:not(.consulting-card-featured):hover .icon-wrapper i {
+  color: var(--contrast-color);
+}
+
+.consulting .consulting-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--heading-color);
+}
+
+.consulting .consulting-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+  margin-bottom: 20px;
+}
+
+.consulting .consulting-card .feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.consulting .consulting-card .feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--default-color), transparent 15%);
+}
+
+.consulting .consulting-card .feature-list li i {
+  color: var(--accent-color);
+  font-size: 14px;
+}
+
+.consulting .consulting-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: gap 0.2s ease;
+}
+
+.consulting .consulting-cta:hover {
+  gap: 14px;
+}
+
+.consulting .consulting-card-featured .consulting-cta {
+  color: rgba(255,255,255,0.9);
+}
+
+.consulting .consulting-cta-banner {
+  margin-top: 60px;
+  background: linear-gradient(135deg, var(--accent-color) 0%, color-mix(in srgb, var(--accent-color), #1a1a2e 40%) 100%);
+  border-radius: 20px;
+  padding: 48px;
+  color: #ffffff;
+}
+
+.consulting .consulting-cta-banner .cta-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.consulting .consulting-cta-banner h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.consulting .consulting-cta-banner p {
+  font-size: 1rem;
+  opacity: 0.85;
+  line-height: 1.6;
+  margin: 0;
+  color: #ffffff;
+}
+
+.consulting .consulting-cta-banner .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #ffffff;
+  color: var(--accent-color);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.consulting .consulting-cta-banner .btn-primary:hover {
+  background: color-mix(in srgb, #ffffff, transparent 10%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 991px) {
+  .consulting .consulting-cta-banner {
+    padding: 36px 28px;
+    text-align: center;
+  }
+
+  .consulting .consulting-cta-banner .btn-primary {
+    margin-top: 24px;
+  }
+
+  .consulting .btn-view-all {
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .consulting .consulting-card {
+    padding: 28px 24px;
+  }
+
+  .consulting .consulting-cta-banner h3 {
+    font-size: 1.4rem;
+  }
+
+  .hero .hero-dual-pill {
+    font-size: 13px;
+    gap: 8px;
+    padding: 8px 14px;
+  }
+}
+
+/* Contact form select styling */
+.contact .form-control select,
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23444' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
